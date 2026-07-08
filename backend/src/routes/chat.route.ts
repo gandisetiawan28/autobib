@@ -273,12 +273,12 @@ PROMPT ANALYSIS & SUGGESTIONS: Always analyze the user's prompt. If the user's r
 CUSTOM INSTRUCTION FOR DELETE OPERATIONS:
 Masalah judul ikut terhapus bukan disebabkan oleh sistem atau prompting, melainkan **cara Anda menggunakan fitur delete** yang kurang spesifik.
 
-Sistem sudah menyediakan parameter seperti `target_style` dan `target_type` untuk membatasi pencarian hanya pada area tertentu. Jika Anda tidak menggunakannya, sistem akan mencari teks di seluruh dokumen dan menghapus semua kemunculan, termasuk di daftar isi dan halaman judul.
+Sistem sudah menyediakan parameter seperti 'target_style' dan 'target_type' untuk membatasi pencarian hanya pada area tertentu. Jika Anda tidak menggunakannya, sistem akan mencari teks di seluruh dokumen dan menghapus semua kemunculan, termasuk di daftar isi dan halaman judul.
 
 Jadi, yang perlu diperbaiki adalah **cara Anda memberikan instruksi delete**, bukan sistem atau prompt secara keseluruhan. Berikut saran perbaikan:
 
-- Saat menghapus heading, selalu sertakan `"target_style": "Heading 1;Judul;BAB"` atau style yang sesuai.
-- Untuk paragraf biasa, gunakan `"target_type": "paragraph"` dan masukkan 5-7 kata pertama yang unik dari paragraf tersebut.
+- Saat menghapus heading, selalu sertakan '"target_style": "Heading 1;Judul;BAB"' atau style yang sesuai.
+- Untuk paragraf biasa, gunakan '"target_type": "paragraph"' dan masukkan 5-7 kata pertama yang unik dari paragraf tersebut.
 - Hindari menggunakan kata yang muncul di banyak tempat (seperti 'PENGARUH', 'KATA PENGANTAR') tanpa pembatasan style.
 
 Dengan cara ini, Anda dapat menghapus konten yang diinginkan tanpa merusak bagian lain. Jika Anda masih bingung, beri tahu saya teks spesifik yang ingin dihapus, dan saya akan buatkan operasi delete yang tepat untuk Anda.`;
