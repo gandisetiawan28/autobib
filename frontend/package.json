@@ -1,0 +1,16 @@
+{
+  "name": "autobib-frontend",
+  "version": "1.0.0",
+  "description": "AutoBib Office Add-in Task Pane",
+  "scripts": {
+    "dev": "office-addin-debugging start ../manifest.xml desktop",
+    "stop": "office-addin-debugging stop ../manifest.xml",
+    "serve": "serve -p 3002 -C --ssl-cert \"C:/Users/Ralvin/.office-addin-dev-certs/localhost.crt\" --ssl-key \"C:/Users/Ralvin/.office-addin-dev-certs/localhost.key\""
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "office-addin-debugging": "latest",
+    "office-addin-dev-certs": "latest",
+    "serve": "^14.2.4"
+  }
+}
