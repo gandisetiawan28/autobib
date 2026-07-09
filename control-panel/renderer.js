@@ -81,3 +81,44 @@ btnSetup.addEventListener('click', async () => {
     btnSetup.disabled = false;
     btnStart.disabled = false;
 });
+
+const mendeleyClientId = document.getElementById('mendeleyClientId');
+const mendeleyClientSecret = document.getElementById('mendeleyClientSecret');
+const btnSaveConfig = document.getElementById('btnSaveConfig');
+
+// Load existing config
+window.addEventListener('DOMContentLoaded', async () => {
+    const config = await window.api.loadConfig();
+    if (config) {
+        mendeleyClientId.value = config.MENDELEY_CLIENT_ID || '';
+        mendeleyClientSecret.value = config.MENDELEY_CLIENT_SECRET || '';
+    }
+});
+
+btnSaveConfig.addEventListener('click', async () => {
+    const config = {
+        MENDELEY_CLIENT_ID: mendeleyClientId.value.trim(),
+        MENDELEY_CLIENT_SECRET: mendeleyClientSecret.value.trim()
+    };
+    
+    btnSaveConfig.textContent = 'Saving...';
+    btnSaveConfig.disabled = true;
+    
+    const result = await window.api.saveConfig(config);
+    
+    if (result.success) {
+        btnSaveConfig.textContent = 'Saved!';
+        btnSaveConfig.style.backgroundColor = 'var(--success)';
+        appendLog('Settings saved successfully.', 'success');
+    } else {
+        btnSaveConfig.textContent = 'Save Failed';
+        btnSaveConfig.style.backgroundColor = 'var(--danger)';
+        appendLog(`Failed to save settings: ${result.error}`, 'error');
+    }
+    
+    setTimeout(() => {
+        btnSaveConfig.textContent = 'Save Settings';
+        btnSaveConfig.style.backgroundColor = 'transparent';
+        btnSaveConfig.disabled = false;
+    }, 2000);
+});

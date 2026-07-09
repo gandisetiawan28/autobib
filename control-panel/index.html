@@ -274,6 +274,24 @@
                 <div class="console-line info">System ready. Waiting for command...</div>
             </div>
         </div>
+
+        <div class="card" style="margin-top: 20px;">
+            <h2 style="font-size: 18px; margin-bottom: 16px; color: var(--text-main);">Settings</h2>
+            
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-size: 14px; margin-bottom: 8px; color: var(--text-muted);">Mendeley Client ID</label>
+                <input type="text" id="mendeleyClientId" placeholder="e.g. 12345" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); background-color: rgba(255, 255, 255, 0.05); color: white; font-family: 'Segoe UI'; font-size: 14px;">
+            </div>
+
+            <div style="margin-bottom: 24px;">
+                <label style="display: block; font-size: 14px; margin-bottom: 8px; color: var(--text-muted);">Mendeley Client Secret</label>
+                <input type="password" id="mendeleyClientSecret" placeholder="Your Client Secret" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); background-color: rgba(255, 255, 255, 0.05); color: white; font-family: 'Segoe UI'; font-size: 14px;">
+            </div>
+
+            <button id="btnSaveConfig" class="btn-secondary" style="padding: 12px 16px; font-size: 14px;">
+                Save Settings
+            </button>
+        </div>
     </div>
 
     <script src="renderer.js"></script>

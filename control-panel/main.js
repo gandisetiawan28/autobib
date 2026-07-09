@@ -2,6 +2,33 @@ const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const { spawn } = require('child_process');
 const kill = require('tree-kill');
+const fs = require('fs');
+
+const configPath = path.join(app.getPath('userData'), 'config.json');
+
+function loadConfig() {
+    try {
+        if (fs.existsSync(configPath)) {
+            return JSON.parse(fs.readFileSync(configPath, 'utf8'));
+        }
+    } catch (e) {
+        console.error('Failed to load config:', e);
+    }
+    return { MENDELEY_CLIENT_ID: '', MENDELEY_CLIENT_SECRET: '' };
+}
+
+ipcMain.handle('load-config', () => {
+    return loadConfig();
+});
+
+ipcMain.handle('save-config', (event, config) => {
+    try {
+        fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+        return { success: true };
+    } catch (e) {
+        return { success: false, error: e.message };
+    }
+});
 
 let mainWindow;
 let backendProcess = null;
@@ -149,7 +176,8 @@ ipcMain.handle('start-server', async () => {
         const regProcess = spawn(process.env.ComSpec || 'cmd.exe', ['/c', 'powershell.exe -Command "' + psCommand + '"'], { cwd: safeCwd, env: process.env });
 
         regProcess.on('close', () => {
-            const env = Object.assign({}, process.env, { ELECTRON_RUN_AS_NODE: '1' });
+            const savedConfig = loadConfig();
+            const env = Object.assign({}, process.env, savedConfig, { ELECTRON_RUN_AS_NODE: '1' });
             env.DB_PATH = path.join(app.getPath('userData'), 'autobib.db');
             env.DOTENV_CONFIG_PATH = isPackaged 
                 ? path.join(process.resourcesPath, '.env')
