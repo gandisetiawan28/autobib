@@ -1,0 +1,35 @@
+name: Build and Release Setup
+
+on:
+  push:
+    tags:
+      - 'v*' # Workflow akan berjalan otomatis jika Anda mem-push tag dengan awalan 'v' (contoh: v1.0.0)
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest # Kita menggunakan runner Windows karena build exe spesifik untuk Windows
+
+    permissions:
+      contents: write # Diperlukan agar bot bisa membuat Release
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # Gunakan versi Node.js yang stabil
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build Executable (Setup)
+        run: npm run build:exe
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/*.exe # Mengambil file installer (.exe) dari folder dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Token otomatis dari GitHub Actions
