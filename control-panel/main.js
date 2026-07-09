@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, shell } = require('electron');
 const path = require('path');
 const { spawn } = require('child_process');
 const kill = require('tree-kill');
@@ -30,6 +30,10 @@ ipcMain.handle('save-config', (event, config) => {
     }
 });
 
+ipcMain.handle('open-external', (event, url) => {
+    shell.openExternal(url);
+});
+
 let mainWindow;
 let backendProcess = null;
 let frontendProcess = null;
@@ -53,12 +57,39 @@ function createWindow() {
     mainWindow.loadFile(path.join(__dirname, 'index.html'));
 }
 
+const { autoUpdater } = require('electron-updater');
+
 app.whenReady().then(() => {
     createWindow();
 
     app.on('activate', function () {
         if (BrowserWindow.getAllWindows().length === 0) createWindow();
     });
+
+    // Handle auto-updater
+    if (isPackaged) {
+        autoUpdater.checkForUpdates();
+
+        autoUpdater.on('update-available', (info) => {
+            if (mainWindow) mainWindow.webContents.send('update-available', info);
+        });
+
+        autoUpdater.on('download-progress', (progressObj) => {
+            if (mainWindow) mainWindow.webContents.send('download-progress', progressObj);
+        });
+
+        autoUpdater.on('update-downloaded', (info) => {
+            if (mainWindow) mainWindow.webContents.send('update-downloaded', info);
+        });
+    }
+});
+
+ipcMain.handle('get-version', () => app.getVersion());
+
+ipcMain.on('install-update', () => {
+    if (isPackaged) {
+        autoUpdater.quitAndInstall();
+    }
 });
 
 app.on('window-all-closed', function () {
@@ -177,7 +208,10 @@ ipcMain.handle('start-server', async () => {
 
         regProcess.on('close', () => {
             const savedConfig = loadConfig();
-            const env = Object.assign({}, process.env, savedConfig, { ELECTRON_RUN_AS_NODE: '1' });
+            const env = Object.assign({}, process.env, savedConfig, { 
+                ELECTRON_RUN_AS_NODE: '1',
+                APP_VERSION: app.getVersion() 
+            });
             env.DB_PATH = path.join(app.getPath('userData'), 'autobib.db');
             env.DOTENV_CONFIG_PATH = isPackaged 
                 ? path.join(process.resourcesPath, '.env')

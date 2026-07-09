@@ -10,7 +10,51 @@ const btnStartText = document.getElementById('btnStartText');
 const setupLoader = document.getElementById('setupLoader');
 const btnSetupText = document.getElementById('btnSetupText');
 
+// Update UI elements
+const updateBanner = document.getElementById('updateBanner');
+const updateTitle = document.getElementById('updateTitle');
+const updateProgressText = document.getElementById('updateProgressText');
+const updateProgressBar = document.getElementById('updateProgressBar');
+const btnInstallUpdate = document.getElementById('btnInstallUpdate');
+const appVersionText = document.getElementById('appVersionText');
+
 let isRunning = false;
+
+window.addEventListener('DOMContentLoaded', async () => {
+    // Get and display version
+    const version = await window.api.getVersion();
+    appVersionText.textContent = `v${version}`;
+
+    // Load existing config
+    const config = await window.api.loadConfig();
+    if (config) {
+        mendeleyClientId.value = config.MENDELEY_CLIENT_ID || '';
+        mendeleyClientSecret.value = config.MENDELEY_CLIENT_SECRET || '';
+    }
+});
+
+// Update Event Listeners
+window.api.onUpdateAvailable((info) => {
+    updateBanner.style.display = 'flex';
+    updateTitle.textContent = `Update v${info.version} Available!`;
+    updateProgressText.textContent = 'Starting download...';
+});
+
+window.api.onDownloadProgress((progressObj) => {
+    updateProgressBar.style.width = `${progressObj.percent}%`;
+    updateProgressText.textContent = `Downloading... ${Math.round(progressObj.percent)}% (${(progressObj.bytesPerSecond / 1024 / 1024).toFixed(2)} MB/s)`;
+});
+
+window.api.onUpdateDownloaded((info) => {
+    updateTitle.textContent = `Update v${info.version} Ready!`;
+    updateProgressText.textContent = 'Download complete. Restart to apply.';
+    updateProgressBar.style.width = '100%';
+    btnInstallUpdate.style.display = 'block';
+});
+
+btnInstallUpdate.addEventListener('click', () => {
+    window.api.installUpdate();
+});
 
 function appendLog(text, type = 'normal') {
     const line = document.createElement('div');
@@ -86,15 +130,6 @@ const mendeleyClientId = document.getElementById('mendeleyClientId');
 const mendeleyClientSecret = document.getElementById('mendeleyClientSecret');
 const btnSaveConfig = document.getElementById('btnSaveConfig');
 
-// Load existing config
-window.addEventListener('DOMContentLoaded', async () => {
-    const config = await window.api.loadConfig();
-    if (config) {
-        mendeleyClientId.value = config.MENDELEY_CLIENT_ID || '';
-        mendeleyClientSecret.value = config.MENDELEY_CLIENT_SECRET || '';
-    }
-});
-
 btnSaveConfig.addEventListener('click', async () => {
     const config = {
         MENDELEY_CLIENT_ID: mendeleyClientId.value.trim(),
@@ -121,4 +156,19 @@ btnSaveConfig.addEventListener('click', async () => {
         btnSaveConfig.style.backgroundColor = 'transparent';
         btnSaveConfig.disabled = false;
     }, 2000);
+});
+
+// Contact Buttons
+document.getElementById('btnContactWa').addEventListener('click', () => {
+    const text = encodeURIComponent('Halo, saya membutuhkan bantuan terkait AutoBib.');
+    window.api.openExternal(`https://wa.me/6281234567890?text=${text}`);
+});
+
+document.getElementById('btnContactIg').addEventListener('click', () => {
+    window.api.openExternal('https://instagram.com/autobib_official');
+});
+
+document.getElementById('btnContactTg').addEventListener('click', () => {
+    const text = encodeURIComponent('Halo, saya membutuhkan bantuan terkait AutoBib.');
+    window.api.openExternal(`https://t.me/autobib_support?text=${text}`);
 });

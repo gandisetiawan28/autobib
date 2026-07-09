@@ -205,6 +205,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
   
+  // Fetch version from backend
+  async function fetchAppVersion() {
+    try {
+      const res = await fetch('http://localhost:3001/health', { method: 'GET', cache: 'no-cache' });
+      if (res.ok) {
+        const data = await res.json();
+        const badge = document.getElementById('app-version-badge');
+        if (badge && data.version) {
+          badge.textContent = `v${data.version}`;
+        }
+      }
+    } catch (err) {
+      console.warn('Could not fetch app version:', err);
+    }
+  }
+
+  fetchAppVersion();
   checkBackendConnection();
   setInterval(checkBackendConnection, 10000); // Check every 10 seconds
 });

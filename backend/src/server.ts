@@ -40,7 +40,8 @@ app.use('/system', systemRoutes);
 
 // ── Health check ──────────────────────────────────────────────
 app.get('/health', (_req, res) => {
-  res.json({ status: 'ok', version: '1.0.0', timestamp: new Date().toISOString() });
+  const version = process.env.APP_VERSION || process.env.npm_package_version || '1.0.0';
+  res.json({ status: 'ok', version, timestamp: new Date().toISOString() });
 });
 
 // ── Error handler (must be last) ─────────────────────────────
