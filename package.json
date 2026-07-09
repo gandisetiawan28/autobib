@@ -1,6 +1,6 @@
 {
   "name": "autobib",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "AutoBib - Word Add-in: AI Multi-Provider + Mendeley Integration",
   "private": true,
   "main": "control-panel/main.js",
@@ -50,6 +50,7 @@
     "nodemon": "^3.1.9",
     "office-addin-debugging": "latest",
     "office-addin-dev-certs": "latest",
+    "sharp": "^0.35.3",
     "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.3"
@@ -70,7 +71,8 @@
       "repo": "autobib"
     },
     "win": {
-      "target": "nsis"
+      "target": "nsis",
+      "icon": "build/icon.png"
     },
     "nsis": {
       "oneClick": false,
