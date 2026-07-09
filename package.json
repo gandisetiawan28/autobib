@@ -1,6 +1,6 @@
 {
   "name": "autobib",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "AutoBib - Word Add-in: AI Multi-Provider + Mendeley Integration",
   "private": true,
   "main": "control-panel/main.js",
@@ -68,7 +68,8 @@
     "publish": {
       "provider": "github",
       "owner": "gandisetiawan28",
-      "repo": "autobib"
+      "repo": "autobib",
+      "releaseType": "release"
     },
     "win": {
       "target": "nsis",
