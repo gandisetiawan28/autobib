@@ -136,52 +136,89 @@ function sendStatus(status) {
 ipcMain.handle('setup-dependencies', async () => {
     return new Promise((resolve) => {
         const installCertAndSharedFolder = () => {
-            sendLog('Installing SSL certificates...', 'info');
-            const certProcess = spawn(process.env.ComSpec || 'cmd.exe', ['/c', 'npx office-addin-dev-certs install'], { cwd: safeCwd, env: process.env });
-            
-            certProcess.stdout.on('data', (data) => sendLog(data.toString()));
-            certProcess.stderr.on('data', (data) => sendLog(data.toString(), 'error'));
-            
+            sendLog('Installing SSL certificates using PowerShell...', 'info');
+
+            const certDir = path.join(process.env.USERPROFILE, '.office-addin-dev-certs');
+            const certPath = path.join(certDir, 'localhost.crt');
+            const keyPath = path.join(certDir, 'localhost.key');
+            const pfxPath = path.join(certDir, 'localhost.pfx');
+
+            // Use PowerShell to create a self-signed cert (no npm/npx required)
+            const certScript = `
+                $certDir = '${certDir.replace(/\\/g, '\\\\')}';
+                if (!(Test-Path $certDir)) { New-Item -ItemType Directory -Force -Path $certDir | Out-Null }
+                $certExists = Test-Path '${certPath.replace(/\\/g, '\\\\')}';
+                if (-not $certExists) {
+                    $cert = New-SelfSignedCertificate -DnsName 'localhost' -CertStoreLocation 'Cert:\\CurrentUser\\My' -NotAfter (Get-Date).AddYears(5) -KeyUsage DigitalSignature,KeyEncipherment -FriendlyName 'AutoBib Dev Cert';
+                    $pwd = ConvertTo-SecureString -String 'autobib' -Force -AsPlainText;
+                    Export-PfxCertificate -Cert $cert -FilePath '${pfxPath.replace(/\\/g, '\\\\')}' -Password $pwd | Out-Null;
+                    Import-Certificate -FilePath (Export-Certificate -Cert $cert -FilePath '${certPath.replace(/\\/g, '\\\\')}' | Select-Object -ExpandProperty FullName) -CertStoreLocation 'Cert:\\CurrentUser\\Root' | Out-Null;
+                    Write-Host 'SSL certificate created and trusted.';
+                } else {
+                    Write-Host 'SSL certificate already exists, skipping.';
+                }
+            `.replace(/\n/g, ' ');
+
+            const certProcess = spawn('powershell.exe', ['-NoProfile', '-Command', certScript], { cwd: safeCwd, env: process.env });
+            certProcess.stdout.on('data', (data) => sendLog(data.toString().trim(), 'info'));
+            certProcess.stderr.on('data', (data) => {
+                const msg = data.toString().trim();
+                if (msg) sendLog(msg, 'error');
+            });
+
             certProcess.on('close', () => {
-                sendLog('Configuring Word Shared Folder...', 'info');
-                
-                const manifestPath = isPackaged 
+                sendLog('SSL setup done. Configuring Word Add-in...', 'info');
+
+                const manifestPath = isPackaged
                     ? path.join(process.resourcesPath, 'manifest.xml')
                     : path.join(projectRoot, 'manifest.xml');
-                
+
+                const manifestId = '815ccf8d-db32-45e5-aa06-d7168c74a009';
+
                 const psScript = `
-                    $folder = 'C:\\AutoBib_Addin';
+                    $manifestPath = '${manifestPath.replace(/\\/g, '\\\\')}';
+                    $manifestId = '${manifestId}';
+                    $folder = 'C:\\\\AutoBib_Addin';
                     if (!(Test-Path $folder)) { New-Item -ItemType Directory -Force -Path $folder | Out-Null; }
-                    Copy-Item -Path '${manifestPath}' -Destination $folder\\manifest.xml -Force;
+                    Copy-Item -Path $manifestPath -Destination "$folder\\\\manifest.xml" -Force;
                     try { New-SmbShare -Name 'AutoBib_Addin' -Path $folder -FullAccess 'Everyone' -ErrorAction SilentlyContinue | Out-Null; } catch {}
-                    $regPath = 'HKCU:\\Software\\Microsoft\\Office\\16.0\\WEF\\TrustedCatalogs\\{-AutoBib-Catalog-}';
-                    New-Item -Path $regPath -Force -ErrorAction SilentlyContinue | Out-Null;
-                    Set-ItemProperty -Path $regPath -Name 'Id' -Value '{-AutoBib-Catalog-}';
-                    Set-ItemProperty -Path $regPath -Name 'Url' -Value '\\\\localhost\\AutoBib_Addin';
-                    Set-ItemProperty -Path $regPath -Name 'Flags' -Value 1;
+                    $catPath = 'HKCU:\\\\Software\\\\Microsoft\\\\Office\\\\16.0\\\\WEF\\\\TrustedCatalogs\\\\{-AutoBib-Catalog-}';
+                    New-Item -Path $catPath -Force -ErrorAction SilentlyContinue | Out-Null;
+                    Set-ItemProperty -Path $catPath -Name 'Id' -Value '{-AutoBib-Catalog-}';
+                    Set-ItemProperty -Path $catPath -Name 'Url' -Value '\\\\\\\\localhost\\\\AutoBib_Addin';
+                    Set-ItemProperty -Path $catPath -Name 'Flags' -Value 1;
+                    $devPath = 'HKCU:\\\\Software\\\\Microsoft\\\\Office\\\\16.0\\\\WEF\\\\Developer';
+                    New-Item -Path $devPath -Force -ErrorAction SilentlyContinue | Out-Null;
+                    Set-ItemProperty -Path $devPath -Name $manifestId -Value $manifestPath;
+                    Write-Host 'Add-in registered in both Developer and Trusted Catalogs.';
                 `.replace(/\n/g, ' ');
 
-                const sharedFolderProcess = spawn(process.env.ComSpec || 'cmd.exe', ['/c', 'powershell.exe -Command "' + psScript + '"'], { cwd: safeCwd, env: process.env });
+                const sharedFolderProcess = spawn('powershell.exe', ['-NoProfile', '-Command', psScript], { cwd: safeCwd, env: process.env });
+                sharedFolderProcess.stdout.on('data', (d) => sendLog(d.toString().trim(), 'info'));
+                sharedFolderProcess.stderr.on('data', (d) => {
+                    const msg = d.toString().trim();
+                    if (msg) sendLog(msg, 'error');
+                });
                 sharedFolderProcess.on('close', () => {
-                    sendLog('Shared Folder configured! Add-in is now in Word.', 'success');
-                    sendLog('Setup complete!', 'success');
+                    sendLog('✅ Add-in is now in Word (Ribbon & Developer tab)!', 'success');
+                    sendLog('✅ Setup complete! Please restart Word to see the changes.', 'success');
                     resolve();
                 });
             });
         };
 
         if (isPackaged) {
-            sendLog('Skipping npm install as dependencies are already bundled in production.', 'success');
+            sendLog('Dependencies bundled. Running setup...', 'info');
             installCertAndSharedFolder();
             return;
         }
 
         sendLog('Running npm install...', 'info');
         const installProcess = spawn(process.env.ComSpec || 'cmd.exe', ['/c', 'npm install'], { cwd: projectRoot, env: process.env });
-        
+
         installProcess.stdout.on('data', (data) => sendLog(data.toString()));
         installProcess.stderr.on('data', (data) => sendLog(data.toString(), 'error'));
-        
+
         installProcess.on('close', (code) => {
             if (code === 0) {
                 sendLog('Dependencies installed successfully!', 'success');

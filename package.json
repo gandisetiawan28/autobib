@@ -1,6 +1,6 @@
 {
   "name": "autobib",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "AutoBib - Word Add-in: AI Multi-Provider + Mendeley Integration",
   "private": true,
   "main": "control-panel/main.js",
