@@ -1,0 +1,101 @@
+{
+  "name": "autobib",
+  "version": "1.0.9",
+  "description": "AutoBib - Word Add-in: AI Multi-Provider + Mendeley Integration",
+  "private": true,
+  "main": "control-panel/main.js",
+  "scripts": {
+    "dev": "concurrently -n \"BACKEND,FRONTEND\" -c \"bgBlue.bold,bgGreen.bold\" \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "nodemon --watch backend/src --ext ts --exec ts-node backend/src/server.ts",
+    "dev:frontend": "serve -p 3002 -C --ssl-cert \"%USERPROFILE%/.office-addin-dev-certs/localhost.crt\" --ssl-key \"%USERPROFILE%/.office-addin-dev-certs/localhost.key\" frontend",
+    "build:backend": "tsc -p backend/tsconfig.json",
+    "build:exe": "taskkill /IM \"AutoBib Server.exe\" /F 2>nul & npm run build:backend && electron-builder --win nsis",
+    "build": "npm run build:exe",
+    "start": "electron .",
+    "stop": "office-addin-debugging stop manifest.xml",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.38.0",
+    "@google/generative-ai": "^0.21.0",
+    "axios": "^1.7.9",
+    "better-sqlite3": "^11.9.1",
+    "concurrently": "^9.2.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "electron-updater": "^6.8.9",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "groq-sdk": "^0.9.0",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
+    "openai": "^4.79.0",
+    "serve": "^14.2.6",
+    "tree-kill": "^1.2.2",
+    "uuid": "^11.1.0",
+    "winston": "^3.17.0"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/jest": "^29.5.14",
+    "@types/jsonwebtoken": "^9.0.9",
+    "@types/morgan": "^1.9.9",
+    "@types/node": "^22.10.7",
+    "@types/uuid": "^10.0.0",
+    "electron": "^29.4.6",
+    "electron-builder": "^23.6.0",
+    "jest": "^29.7.0",
+    "nodemon": "^3.1.9",
+    "office-addin-debugging": "latest",
+    "office-addin-dev-certs": "latest",
+    "sharp": "^0.35.3",
+    "ts-jest": "^29.2.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3"
+  },
+  "overrides": {
+    "strip-bom": "3.0.0",
+    "@types/minimatch": "5.1.2"
+  },
+  "build": {
+    "appId": "com.autobib.server",
+    "productName": "AutoBib Server",
+    "directories": {
+      "output": "dist"
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "gandisetiawan28",
+      "repo": "autobib",
+      "releaseType": "release"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "build/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    },
+    "files": [
+      "control-panel/**/*",
+      "dist-backend/**/*",
+      "backend/database/**/*",
+      "frontend/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "manifest.xml",
+        "to": "manifest.xml"
+      },
+      {
+        "from": "backend/.env",
+        "to": ".env"
+      }
+    ]
+  }
+}

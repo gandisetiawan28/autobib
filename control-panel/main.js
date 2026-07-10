@@ -1,0 +1,329 @@
+const { app, BrowserWindow, ipcMain, shell } = require('electron');
+const path = require('path');
+const { spawn } = require('child_process');
+const kill = require('tree-kill');
+const fs = require('fs');
+
+const configPath = path.join(app.getPath('userData'), 'config.json');
+
+function loadConfig() {
+    try {
+        if (fs.existsSync(configPath)) {
+            return JSON.parse(fs.readFileSync(configPath, 'utf8'));
+        }
+    } catch (e) {
+        console.error('Failed to load config:', e);
+    }
+    return { MENDELEY_CLIENT_ID: '', MENDELEY_CLIENT_SECRET: '' };
+}
+
+ipcMain.handle('load-config', () => {
+    return loadConfig();
+});
+
+ipcMain.handle('save-config', (event, config) => {
+    try {
+        fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+        return { success: true };
+    } catch (e) {
+        return { success: false, error: e.message };
+    }
+});
+
+ipcMain.handle('open-external', (event, url) => {
+    shell.openExternal(url);
+});
+
+let mainWindow;
+let backendProcess = null;
+let frontendProcess = null;
+const isPackaged = app.isPackaged || __dirname.includes('app.asar');
+const projectRoot = path.join(__dirname, '..');
+const safeCwd = isPackaged ? path.dirname(app.getPath('exe')) : projectRoot;
+
+function createWindow() {
+    mainWindow = new BrowserWindow({
+        width: 800,
+        height: 600,
+        webPreferences: {
+            preload: path.join(__dirname, 'preload.js'),
+            nodeIntegration: false,
+            contextIsolation: true
+        },
+        autoHideMenuBar: true,
+        backgroundColor: '#0f172a'
+    });
+
+    mainWindow.loadFile(path.join(__dirname, 'index.html'));
+}
+
+const { autoUpdater } = require('electron-updater');
+
+app.whenReady().then(() => {
+    createWindow();
+
+    app.on('activate', function () {
+        if (BrowserWindow.getAllWindows().length === 0) createWindow();
+    });
+
+    // Handle auto-updater
+    if (isPackaged) {
+        autoUpdater.checkForUpdates();
+
+        autoUpdater.on('update-available', (info) => {
+            if (mainWindow) mainWindow.webContents.send('update-available', info);
+        });
+
+        autoUpdater.on('download-progress', (progressObj) => {
+            if (mainWindow) mainWindow.webContents.send('download-progress', progressObj);
+        });
+
+        autoUpdater.on('update-downloaded', (info) => {
+            if (mainWindow) mainWindow.webContents.send('update-downloaded', info);
+        });
+    }
+});
+
+ipcMain.handle('get-version', () => app.getVersion());
+
+ipcMain.on('install-update', () => {
+    if (isPackaged) {
+        autoUpdater.quitAndInstall();
+    }
+});
+
+app.on('window-all-closed', function () {
+    app.quit();
+});
+
+let isQuitting = false;
+
+app.on('before-quit', (e) => {
+    if (isQuitting) return;
+
+    let killedCount = 0;
+    const checkQuit = () => {
+        killedCount++;
+        if (killedCount >= 2) {
+            isQuitting = true;
+            app.quit();
+        }
+    };
+
+    if (backendProcess && backendProcess.pid) {
+        e.preventDefault();
+        try { kill(backendProcess.pid, 'SIGKILL', checkQuit); } catch (e) { checkQuit(); }
+    } else { checkQuit(); }
+
+    if (frontendProcess && frontendProcess.pid) {
+        e.preventDefault();
+        try { kill(frontendProcess.pid, 'SIGKILL', checkQuit); } catch (e) { checkQuit(); }
+    } else { checkQuit(); }
+});
+
+function sendLog(text, type = 'normal') {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('log', { text, type });
+    }
+}
+
+function sendStatus(status) {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('status-change', status);
+    }
+}
+
+ipcMain.handle('setup-dependencies', async () => {
+    return new Promise((resolve) => {
+        const installCertAndSharedFolder = () => {
+            sendLog('Installing SSL certificates using PowerShell...', 'info');
+
+            const certDir = path.join(process.env.USERPROFILE, '.office-addin-dev-certs');
+            const certPath = path.join(certDir, 'localhost.crt');
+            const keyPath = path.join(certDir, 'localhost.key');
+            const pfxPath = path.join(certDir, 'localhost.pfx');
+
+            // Use PowerShell to create a self-signed cert (no npm/npx required)
+            const certScript = `
+                $certDir = '${certDir.replace(/\\/g, '\\\\')}';
+                if (!(Test-Path $certDir)) { New-Item -ItemType Directory -Force -Path $certDir | Out-Null }
+                $certExists = Test-Path '${certPath.replace(/\\/g, '\\\\')}';
+                if (-not $certExists) {
+                    $cert = New-SelfSignedCertificate -DnsName 'localhost' -CertStoreLocation 'Cert:\\CurrentUser\\My' -NotAfter (Get-Date).AddYears(5) -KeyUsage DigitalSignature,KeyEncipherment -FriendlyName 'AutoBib Dev Cert';
+                    $pwd = ConvertTo-SecureString -String 'autobib' -Force -AsPlainText;
+                    Export-PfxCertificate -Cert $cert -FilePath '${pfxPath.replace(/\\/g, '\\\\')}' -Password $pwd | Out-Null;
+                    Import-Certificate -FilePath (Export-Certificate -Cert $cert -FilePath '${certPath.replace(/\\/g, '\\\\')}' | Select-Object -ExpandProperty FullName) -CertStoreLocation 'Cert:\\CurrentUser\\Root' | Out-Null;
+                    Write-Host 'SSL certificate created and trusted.';
+                } else {
+                    Write-Host 'SSL certificate already exists, skipping.';
+                }
+            `.replace(/\n/g, ' ');
+
+            const certProcess = spawn('powershell.exe', ['-NoProfile', '-Command', certScript], { cwd: safeCwd, env: process.env });
+            certProcess.stdout.on('data', (data) => sendLog(data.toString().trim(), 'info'));
+            certProcess.stderr.on('data', (data) => {
+                const msg = data.toString().trim();
+                if (msg) sendLog(msg, 'error');
+            });
+
+            certProcess.on('close', () => {
+                sendLog('SSL setup done. Configuring Word Add-in...', 'info');
+
+                const manifestPath = isPackaged
+                    ? path.join(process.resourcesPath, 'manifest.xml')
+                    : path.join(projectRoot, 'manifest.xml');
+
+                const manifestId = '815ccf8d-db32-45e5-aa06-d7168c74a009';
+
+                const psScript = `
+                    $manifestPath = '${manifestPath.replace(/\\/g, '\\\\')}';
+                    $manifestId = '${manifestId}';
+                    $folder = 'C:\\\\AutoBib_Addin';
+                    if (!(Test-Path $folder)) { New-Item -ItemType Directory -Force -Path $folder | Out-Null; }
+                    Copy-Item -Path $manifestPath -Destination "$folder\\\\manifest.xml" -Force;
+                    try { New-SmbShare -Name 'AutoBib_Addin' -Path $folder -FullAccess 'Everyone' -ErrorAction SilentlyContinue | Out-Null; } catch {}
+                    $catPath = 'HKCU:\\\\Software\\\\Microsoft\\\\Office\\\\16.0\\\\WEF\\\\TrustedCatalogs\\\\{-AutoBib-Catalog-}';
+                    New-Item -Path $catPath -Force -ErrorAction SilentlyContinue | Out-Null;
+                    Set-ItemProperty -Path $catPath -Name 'Id' -Value '{-AutoBib-Catalog-}';
+                    Set-ItemProperty -Path $catPath -Name 'Url' -Value '\\\\\\\\localhost\\\\AutoBib_Addin';
+                    Set-ItemProperty -Path $catPath -Name 'Flags' -Value 1;
+                    $devPath = 'HKCU:\\\\Software\\\\Microsoft\\\\Office\\\\16.0\\\\WEF\\\\Developer';
+                    New-Item -Path $devPath -Force -ErrorAction SilentlyContinue | Out-Null;
+                    Set-ItemProperty -Path $devPath -Name $manifestId -Value $manifestPath;
+                    Write-Host 'Add-in registered in both Developer and Trusted Catalogs.';
+                `.replace(/\n/g, ' ');
+
+                const sharedFolderProcess = spawn('powershell.exe', ['-NoProfile', '-Command', psScript], { cwd: safeCwd, env: process.env });
+                sharedFolderProcess.stdout.on('data', (d) => sendLog(d.toString().trim(), 'info'));
+                sharedFolderProcess.stderr.on('data', (d) => {
+                    const msg = d.toString().trim();
+                    if (msg) sendLog(msg, 'error');
+                });
+                sharedFolderProcess.on('close', () => {
+                    sendLog('✅ Add-in is now in Word (Ribbon & Developer tab)!', 'success');
+                    sendLog('✅ Setup complete! Please restart Word to see the changes.', 'success');
+                    resolve();
+                });
+            });
+        };
+
+        if (isPackaged) {
+            sendLog('Dependencies bundled. Running setup...', 'info');
+            installCertAndSharedFolder();
+            return;
+        }
+
+        sendLog('Running npm install...', 'info');
+        const installProcess = spawn(process.env.ComSpec || 'cmd.exe', ['/c', 'npm install'], { cwd: projectRoot, env: process.env });
+
+        installProcess.stdout.on('data', (data) => sendLog(data.toString()));
+        installProcess.stderr.on('data', (data) => sendLog(data.toString(), 'error'));
+
+        installProcess.on('close', (code) => {
+            if (code === 0) {
+                sendLog('Dependencies installed successfully!', 'success');
+            } else {
+                sendLog(`Install failed with code ${code}`, 'error');
+            }
+            installCertAndSharedFolder();
+        });
+    });
+});
+
+ipcMain.handle('start-server', async () => {
+    if (backendProcess || frontendProcess) return;
+
+    return new Promise((resolve) => {
+        sendLog('Injecting manifest to Registry...', 'info');
+
+        const manifestPath = isPackaged 
+            ? path.join(process.resourcesPath, 'manifest.xml')
+            : path.join(projectRoot, 'manifest.xml');
+        const psCommand = `$manifestPath = '${manifestPath}'; $manifestId = '815ccf8d-db32-45e5-aa06-d7168c74a009'; New-Item -Path 'HKCU:\\Software\\Microsoft\\Office\\16.0\\WEF\\Developer' -Force -ErrorAction SilentlyContinue | Out-Null; Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Office\\16.0\\WEF\\Developer' -Name $manifestId -Value $manifestPath`;
+
+        const regProcess = spawn(process.env.ComSpec || 'cmd.exe', ['/c', 'powershell.exe -Command "' + psCommand + '"'], { cwd: safeCwd, env: process.env });
+
+        regProcess.on('close', () => {
+            const savedConfig = loadConfig();
+            const env = Object.assign({}, process.env, savedConfig, { 
+                ELECTRON_RUN_AS_NODE: '1',
+                APP_VERSION: app.getVersion() 
+            });
+            env.DB_PATH = path.join(app.getPath('userData'), 'autobib.db');
+            env.DOTENV_CONFIG_PATH = isPackaged 
+                ? path.join(process.resourcesPath, '.env')
+                : path.join(projectRoot, 'backend', '.env');
+            const cwd = process.resourcesPath || path.dirname(projectRoot);
+
+            const backendCmd = path.join(projectRoot, 'dist-backend', 'server.js');
+            const servePath = path.join(projectRoot, 'node_modules', 'serve', 'build', 'main.js');
+            const frontendDir = path.join(projectRoot, 'frontend');
+            const sslCert = path.join(process.env.USERPROFILE, '.office-addin-dev-certs', 'localhost.crt');
+            const sslKey = path.join(process.env.USERPROFILE, '.office-addin-dev-certs', 'localhost.key');
+
+            // Spawn Backend
+            backendProcess = spawn(process.execPath, [backendCmd], { cwd, env, stdio: 'pipe' });
+            
+            backendProcess.stdout.on('data', (data) => {
+                const text = data.toString().trim();
+                if (text) sendLog(`[BACKEND] ${text}`);
+            });
+            backendProcess.stderr.on('data', (data) => {
+                const text = data.toString().trim();
+                if (text) sendLog(`[BACKEND] ${text}`, 'error');
+            });
+            backendProcess.on('close', (code) => {
+                sendLog(`[BACKEND] exited with code ${code}`, 'error');
+                backendProcess = null;
+                if (!frontendProcess) sendStatus('stopped');
+            });
+
+            // Spawn Frontend
+            frontendProcess = spawn(process.execPath, [
+                servePath, '-p', '3002', '-C', 
+                '--ssl-cert', sslCert, '--ssl-key', sslKey, frontendDir
+            ], { cwd, env, stdio: 'pipe' });
+
+            frontendProcess.stdout.on('data', (data) => {
+                const text = data.toString().trim();
+                if (text) sendLog(`[FRONTEND] ${text}`);
+            });
+            frontendProcess.stderr.on('data', (data) => {
+                const text = data.toString().trim();
+                if (text) sendLog(`[FRONTEND] ${text}`, 'error');
+            });
+            frontendProcess.on('close', (code) => {
+                sendLog(`[FRONTEND] exited with code ${code}`, 'error');
+                frontendProcess = null;
+                if (!backendProcess) sendStatus('stopped');
+            });
+
+            sendStatus('running');
+            resolve();
+        });
+    });
+});
+
+ipcMain.handle('stop-server', async () => {
+    return new Promise((resolve) => {
+        let killedCount = 0;
+        const checkDone = () => {
+            killedCount++;
+            if (killedCount >= 2) {
+                sendStatus('stopped');
+                sendLog('Servers stopped.', 'success');
+                resolve();
+            }
+        };
+
+        if (backendProcess && backendProcess.pid) {
+            sendLog('Killing backend process...', 'info');
+            kill(backendProcess.pid, 'SIGKILL', () => { backendProcess = null; checkDone(); });
+        } else { checkDone(); }
+
+        if (frontendProcess && frontendProcess.pid) {
+            sendLog('Killing frontend process...', 'info');
+            kill(frontendProcess.pid, 'SIGKILL', () => { frontendProcess = null; checkDone(); });
+        } else { checkDone(); }
+    });
+});

@@ -1,0 +1,1 @@
+$regPath = 'HKCU:\Software\Microsoft\Office\16.0\WEF\Developer'; New-Item -Path $regPath -Force -ErrorAction SilentlyContinue | Out-Null; Set-ItemProperty -Path $regPath -Name '815ccf8d-db32-45e5-aa06-d7168c74a009' -Value 'D:\Gandi PC\autobib-master\autobib-master\manifest.xml'
