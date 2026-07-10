@@ -5,6 +5,7 @@
   "private": true,
   "main": "control-panel/main.js",
   "scripts": {
+    "predev": "node -e \"const{execSync}=require('child_process');try{const v=execSync('node -e \\\"process.versions.modules\\\"').toString().trim();const built=require('./node_modules/better-sqlite3/build/Release/better_sqlite3.node');console.log('[predev] better-sqlite3 OK');}catch(e){console.log('[predev] Rebuilding better-sqlite3...');execSync('npm rebuild better-sqlite3',{stdio:'inherit'});}\"",
     "dev": "concurrently -n \"BACKEND,FRONTEND\" -c \"bgBlue.bold,bgGreen.bold\" \"npm run dev:backend\" \"npm run dev:frontend\"",
     "dev:backend": "nodemon --watch backend/src --ext ts --exec ts-node backend/src/server.ts",
     "dev:frontend": "serve -p 3002 -C --ssl-cert \"%USERPROFILE%/.office-addin-dev-certs/localhost.crt\" --ssl-key \"%USERPROFILE%/.office-addin-dev-certs/localhost.key\" frontend",

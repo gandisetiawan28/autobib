@@ -62,14 +62,52 @@ const OfficeBridge = (() => {
   let isStreaming = false;
   let hasClearedSelection = false;
   let shouldReplaceStream = true;
+  // ===== SISTEM UNDO =====
+  let undoStack = {};
+  
+  // Fungsi untuk membalikkan aksi (Undo)
+  async function undoAction(actionId) {
+    const action = undoStack[actionId];
+    if (!action) throw new Error("Aksi tidak ditemukan di riwayat Undo.");
+    
+    if (action.type === 'replace') {
+      // Reversal: Cari teks yang 'baru' (yang disisipkan AI), lalu timpa kembali dengan teks 'lama' (asli)
+      await searchAndReplaceSelection([{
+        find: action.replaced_with,
+        replace: action.original_text,
+        actionId: null // Jangan catat undo ini sebagai operasi yang bisa di-undo lagi
+      }], true); // true = run silently/synchronously without typing effect
+    } else if (action.type === 'insert') {
+      // Reversal: Cari teks yang baru saja diketik AI, lalu hapus
+      await searchAndReplaceSelection([{
+        find: action.inserted_text,
+        replace: "",
+        actionId: null
+      }], true);
+    } else {
+      throw new Error(`Undo untuk tipe aksi '${action.type}' belum didukung.`);
+    }
+  }
 
-  async function startLiveStream(replace = true) {
-    if (!_isReady) return;
-    isStreaming = true;
+  // Generate ID unik
+  function generateId() {
+    return Math.random().toString(36).substr(2, 9);
+  }
+
+  function addUndoRecord(actionId, type, data) {
+    undoStack[actionId] = { type, ...data };
+  }
+  // =======================
+
+  let isTypingLoopRunning = false;
+
+  async function startLiveStream(replace = false) {
     streamQueue = "";
+    isStreaming = true;
     hasClearedSelection = false;
     shouldReplaceStream = replace;
     streamRange = null;
+    startTypingLoop();
   }
 
   async function appendLiveStream(chunk) {
@@ -77,59 +115,79 @@ const OfficeBridge = (() => {
     streamQueue += chunk;
   }
 
-  let isFlushing = false;
-  async function flushStreamQueue() {
-    if (isFlushing || streamQueue.length === 0) return;
-    isFlushing = true;
+  async function startTypingLoop() {
+    if (isTypingLoopRunning) return;
+    isTypingLoopRunning = true;
     
-    const textToInsert = streamQueue;
-    streamQueue = ""; 
-    try {
-      if (!hasClearedSelection || !streamRange) {
-          await Word.run(async (ctx) => {
-            const sel = ctx.document.getSelection();
-            if (shouldReplaceStream) {
-              sel.insertText("", Word.InsertLocation.replace);
-              streamRange = sel.insertText(textToInsert, Word.InsertLocation.end);
-            } else {
-              streamRange = sel.insertText(textToInsert, Word.InsertLocation.after);
-            }
-            streamRange.track();
-            hasClearedSelection = true;
-            await ctx.sync();
-          });
-      } else {
-          // Gunakan Word.run dengan objek streamRange yang sudah ditrack dari sesi sebelumnya
-          await Word.run(streamRange, async (ctx) => {
-             streamRange.insertText(textToInsert, Word.InsertLocation.end);
-             await ctx.sync();
-          });
+    while (isStreaming || streamQueue.length > 0) {
+      if (streamQueue.length === 0) {
+        await new Promise(r => setTimeout(r, 50));
+        continue;
       }
-    } catch (err) {
-      console.error("Stream sync error:", err);
-      // Pulihkan antrean jika gagal agar tidak hilang
-      streamQueue = textToInsert + streamQueue;
       
-      // Jika terjadi error (misalnya streamRange menjadi invalid atau terhapus), reset status agar mengambil selection baru pada percobaan berikutnya
-      hasClearedSelection = false;
-      streamRange = null;
-      // Jangan timpa teks yang sudah ada, lanjutkan dari kursor terakhir
-      shouldReplaceStream = false; 
-    } finally {
-      isFlushing = false;
+      // Adaptive batching: Jika antrean menumpuk karena kecepatan AI, ambil lebih banyak huruf sekaligus
+      let charsToTake = 1;
+      if (streamQueue.length > 20) charsToTake = 3;
+      if (streamQueue.length > 50) charsToTake = 8;
+      if (streamQueue.length > 150) charsToTake = streamQueue.length; 
+      
+      const textToInsert = streamQueue.substring(0, charsToTake);
+      streamQueue = streamQueue.substring(charsToTake);
+      
+      try {
+        if (!hasClearedSelection || !streamRange) {
+            await Word.run(async (ctx) => {
+              const sel = ctx.document.getSelection();
+              if (shouldReplaceStream) {
+                sel.insertText("", Word.InsertLocation.replace);
+                streamRange = sel.insertText(textToInsert, Word.InsertLocation.end);
+              } else {
+                streamRange = sel.insertText(textToInsert, Word.InsertLocation.after);
+              }
+              streamRange.track();
+              streamRange.select('End'); // Auto-scroll to end
+              hasClearedSelection = true;
+              await ctx.sync();
+            });
+        } else {
+            await Word.run(streamRange, async (ctx) => {
+               streamRange.insertText(textToInsert, Word.InsertLocation.end);
+               streamRange.select('End'); // Auto-scroll to end
+               await ctx.sync();
+            });
+        }
+        
+        // Adaptive Delay: Mensimulasikan jeda pengetikan manusia
+        const lastChar = textToInsert.slice(-1);
+        let delay = 20; // Default: cepat
+        if (['.', '?', '!'].includes(lastChar)) delay = 300; // Jeda di akhir kalimat
+        else if ([',', ';', ':'].includes(lastChar)) delay = 150; // Jeda di tengah kalimat
+        else if (lastChar === '\n') delay = 400; // Jeda saat paragraf baru
+        
+        if (delay > 0) await new Promise(r => setTimeout(r, delay));
+        
+      } catch (err) {
+        console.error("Stream sync error:", err);
+        streamQueue = textToInsert + streamQueue; // Restore queue
+        hasClearedSelection = false;
+        streamRange = null;
+        shouldReplaceStream = false; 
+        await new Promise(r => setTimeout(r, 500));
+      }
     }
+    isTypingLoopRunning = false;
   }
 
-  // Batch sync every 500ms to prevent freezing Word
-  setInterval(async () => {
-    if (isStreaming) {
-      await flushStreamQueue();
-    }
-  }, 500);
-
   async function stopLiveStream() {
-    await flushStreamQueue(); // Ensure remaining chunks are written!
-    
+    isStreaming = false; 
+
+    // Tunggu sampai loop mengetik selesai memproses sisa antrean
+    let retries = 0;
+    while (isTypingLoopRunning && retries < 100) { 
+      await new Promise(r => setTimeout(r, 50));
+      retries++;
+    }
+
     if (streamRange) {
       try {
         await Word.run(async (ctx) => {
@@ -599,7 +657,7 @@ const OfficeBridge = (() => {
   /**
    * Search and replace specific texts in the current selection
    */
-  async function searchAndReplaceSelection(replacements) {
+  async function searchAndReplaceSelection(replacements, silentUndo = false) {
     if (!_isReady || !replacements || !replacements.length) return;
     console.log('[OfficeBridge] searchAndReplaceSelection start', { count: replacements.length });
 
@@ -623,13 +681,22 @@ const OfficeBridge = (() => {
             await ctx.sync();
 
             if (results.items.length > 0) {
-              for (let i = 0; i < results.items.length; i++) {
-                insertMarkdown(
-                  results.items[i],
-                  rep.replace,
-                  Word.InsertLocation.replace,
-                  rep.style
-                );
+              // Jika silentUndo aktif, replace sekaligus tanpa animasi
+              if (silentUndo) {
+                for (let i = 0; i < results.items.length; i++) {
+                  insertMarkdown(results.items[i], rep.replace, Word.InsertLocation.replace, rep.style);
+                }
+                await ctx.sync();
+              } else {
+                for (let i = 0; i < results.items.length; i++) {
+                  results.items[i].select(); // Auto-scroll
+                  results.items[i].insertText("", Word.InsertLocation.replace);
+                  await ctx.sync();
+                  // Panggil stream efek ngetik (harus lepas dari Word.run sementara)
+                  startLiveStream(false);
+                  appendLiveStream(rep.replace);
+                  await stopLiveStream();
+                }
               }
               successCount++;
             } else {
@@ -638,12 +705,29 @@ const OfficeBridge = (() => {
           } else {
             const targetRange = await findTargetRange(ctx, searchTarget, rep);
             if (targetRange) {
-              insertMarkdown(
-                targetRange,
-                rep.replace,
-                Word.InsertLocation.replace,
-                rep.style
-              );
+              if (silentUndo) {
+                insertMarkdown(targetRange, rep.replace, Word.InsertLocation.replace, rep.style);
+                await ctx.sync();
+              } else {
+                targetRange.select();
+                targetRange.insertText("", Word.InsertLocation.replace); // Hapus dulu
+                await ctx.sync();
+                // Stream ngetik live
+                startLiveStream(false);
+                appendLiveStream(rep.replace);
+                await stopLiveStream();
+              }
+              
+              // Simpan state untuk Undo
+              if (rep.actionId !== null) {
+                const id = rep.actionId || generateId();
+                undoStack[id] = {
+                  type: 'replace',
+                  original_text: rep.find,
+                  replaced_with: rep.replace
+                };
+              }
+              
               successCount++;
             } else {
               lastFailedText = rep.find;
@@ -795,7 +879,7 @@ const OfficeBridge = (() => {
           }
           successCount++;
         } else {
-          lastFailedText = targetText.substring(0, 50);
+          lastFailedText = req.find.substring(0, 50);
         }
       }
       
@@ -1874,10 +1958,10 @@ const OfficeBridge = (() => {
     init, isOfficeReady, insertText, insertHtml, appendText, 
     insertOoxml, scanForCitations, replaceCitationWithField, 
     getAllText, getSelectedText, getAllStyles,
-    startLiveStream, appendLiveStream, stopLiveStream,
+    startLiveStream, stopLiveStream, appendLiveStream,
     searchAndReplaceSelection, addCommentSelection, highlightSelection, insertTableSelection, editTableSelection, formatSelection, deleteSelection,
     insertTextAtTarget, extractMendeleyCitations, insertBibliography, updateBibliography, hasBibliography, stripCitationFormatting,
-    debugContentControls
+    debugContentControls, undoAction, addUndoRecord, findTargetRange, generateId
   };
 })();
 

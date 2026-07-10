@@ -20,10 +20,10 @@ window.showToast = (msg, type = 'info') => {
 window.showConfirm = (title, message, onConfirm) => {
   const overlay = document.createElement('div');
   overlay.className = 'confirm-overlay';
-  
+
   const popup = document.createElement('div');
   popup.className = 'confirm-popup';
-  
+
   popup.innerHTML = `
     <div class="confirm-header">
       <h4>${title}</h4>
@@ -36,10 +36,10 @@ window.showConfirm = (title, message, onConfirm) => {
       <button class="btn btn-primary" id="confirm-ok" style="background:var(--red);border-color:var(--red);color:white;">Hapus</button>
     </div>
   `;
-  
+
   overlay.appendChild(popup);
   document.body.appendChild(overlay);
-  
+
   // Trigger animation
   setTimeout(() => overlay.classList.add('active'), 10);
 
@@ -51,17 +51,17 @@ window.showConfirm = (title, message, onConfirm) => {
   popup.querySelector('#confirm-cancel').onclick = close;
   popup.querySelector('#confirm-ok').onclick = () => {
     close();
-    if(onConfirm) onConfirm();
+    if (onConfirm) onConfirm();
   };
 };
 
 window.showPrompt = (title, defaultValue, onSubmit) => {
   const overlay = document.createElement('div');
   overlay.className = 'confirm-overlay'; // reuse overlay style
-  
+
   const popup = document.createElement('div');
   popup.className = 'confirm-popup';
-  
+
   popup.innerHTML = `
     <div class="confirm-header">
       <h4>${title}</h4>
@@ -74,12 +74,12 @@ window.showPrompt = (title, defaultValue, onSubmit) => {
       <button class="btn btn-primary" id="prompt-ok">Simpan</button>
     </div>
   `;
-  
+
   overlay.appendChild(popup);
   document.body.appendChild(overlay);
-  
+
   const input = popup.querySelector('#prompt-input');
-  
+
   setTimeout(() => {
     overlay.classList.add('active');
     input.focus();
@@ -92,13 +92,13 @@ window.showPrompt = (title, defaultValue, onSubmit) => {
   };
 
   popup.querySelector('#prompt-cancel').onclick = close;
-  
+
   const submit = () => {
     const val = input.value;
     close();
-    if(onSubmit) onSubmit(val);
+    if (onSubmit) onSubmit(val);
   };
-  
+
   popup.querySelector('#prompt-ok').onclick = submit;
   input.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') submit();
@@ -111,19 +111,31 @@ function setupTabs() {
   const tabBtns = document.querySelectorAll('.tab-btn');
   const tabPanels = document.querySelectorAll('.tab-panel');
 
+  function switchTab(tabId) {
+    tabBtns.forEach(b => {
+      b.classList.remove('active');
+      b.setAttribute('aria-selected', 'false');
+    });
+    tabPanels.forEach(p => p.classList.remove('active'));
+
+    const targetBtn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
+    const targetPanel = document.getElementById(`tab-${tabId}`);
+    if (targetBtn && targetPanel) {
+      targetBtn.classList.add('active');
+      targetBtn.setAttribute('aria-selected', 'true');
+      targetPanel.classList.add('active');
+    }
+  }
+
+  // Restore last active tab from localStorage
+  const savedTab = localStorage.getItem('autobib_last_tab') || 'references';
+  switchTab(savedTab);
+
   tabBtns.forEach(btn => {
     btn.addEventListener('click', () => {
-      tabBtns.forEach(b => {
-        b.classList.remove('active');
-        b.setAttribute('aria-selected', 'false');
-      });
-      tabPanels.forEach(p => p.classList.remove('active'));
-
-      btn.classList.add('active');
-      btn.setAttribute('aria-selected', 'true');
-      
       const tabId = btn.getAttribute('data-tab');
-      document.getElementById(`tab-${tabId}`).classList.add('active');
+      switchTab(tabId);
+      localStorage.setItem('autobib_last_tab', tabId);
     });
   });
 }
@@ -132,7 +144,7 @@ function setupTabs() {
 function setupTheme() {
   const btn = document.getElementById('theme-toggle');
   const html = document.documentElement;
-  
+
   const saved = localStorage.getItem('autobib_theme') || 'dark';
   html.setAttribute('data-theme', saved);
 
@@ -149,7 +161,7 @@ function setupNavToggle() {
   const btn = document.getElementById('nav-toggle');
   const nav = document.getElementById('tab-nav');
   if (!btn || !nav) return;
-  
+
   // Optional: Restore saved state
   const isCollapsed = localStorage.getItem('autobib_nav_collapsed') === 'true';
   if (isCollapsed) nav.classList.add('collapsed');
@@ -165,7 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setupTabs();
   setupTheme();
   setupNavToggle();
-  
+
   // Init Office.js
   OfficeBridge.init((isReady) => {
     if (isReady) {
@@ -204,7 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
       badgeDot.title = 'Backend Offline / Error Koneksi';
     }
   }
-  
+
   // Fetch version from backend
   async function fetchAppVersion() {
     try {
