@@ -1,0 +1,1318 @@
+2026-07-10 13:32:49 [INFO] Database ready at D:\Gandi PC\autobib-master\autobib-master\backend\database\autobib.db
+2026-07-10 13:32:49 [INFO] ✅ Database initialized
+2026-07-10 13:32:49 [INFO] 🚀 AutoBib backend running on http://localhost:3001
+2026-07-10 13:32:54 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:32:54 [ERROR] [401] Invalid or expired token
+Error: Invalid or expired token
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:29:21)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:32:54 [ERROR] [401] Invalid or expired token
+Error: Invalid or expired token
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:29:21)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:33:04 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:33:14 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:33:18 [ERROR] Chat Streaming Error: Local Bridge tidak berjalan (port 3000)
+Error: Local Bridge tidak berjalan (port 3000)
+    at D:\Gandi PC\autobib-master\autobib-master\backend\src\routes\chat.route.ts:343:46
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-07-10 13:33:24 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:33:34 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:33:44 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:33:54 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:34:04 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:34:14 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:34:24 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:34:34 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:34:44 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:34:54 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:35:04 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:35:14 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:35:24 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:35:34 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:35:44 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:35:54 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:36:04 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:36:14 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:36:24 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:36:34 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:36:44 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:36:54 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:37:01 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:37:11 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:37:21 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:37:31 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:37:41 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:37:51 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:38:01 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:38:11 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:38:21 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:38:31 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:38:41 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:38:51 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:39:01 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:39:11 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:39:21 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:39:31 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:39:41 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:39:51 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:40:01 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:40:11 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:40:21 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:40:31 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:40:41 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:40:51 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:41:01 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:41:11 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:41:21 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:41:31 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:41:41 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:41:51 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:42:01 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:42:11 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:42:21 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:42:31 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:42:41 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:42:51 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:43:01 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:43:11 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:43:21 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:43:31 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:43:41 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:43:51 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:44:01 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:44:11 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:44:21 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:44:31 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:44:41 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:44:51 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:45:01 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:45:11 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:45:21 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:45:31 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:45:41 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:45:51 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:46:01 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:46:11 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:46:21 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:46:31 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:46:41 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:46:51 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:47:01 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-10 13:47:11 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\Gandi PC\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at Function.process_params (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at Function.handle (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\Gandi PC\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-11 03:59:12 [INFO] Database ready at D:\1. MY CODE\autobib-master\autobib-master\backend\database\autobib.db
+2026-07-11 03:59:12 [INFO] ✅ Database initialized
+2026-07-11 03:59:12 [INFO] 🚀 AutoBib backend running on http://localhost:3001
+2026-07-11 03:59:13 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\1. MY CODE\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\1. MY CODE\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at router.process_params (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at router.handle (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-11 03:59:23 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\1. MY CODE\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\1. MY CODE\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at router.process_params (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at router.handle (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-11 03:59:33 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\1. MY CODE\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\1. MY CODE\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at router.process_params (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at router.handle (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-11 03:59:43 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\1. MY CODE\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\1. MY CODE\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at router.process_params (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at router.handle (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-11 03:59:53 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\1. MY CODE\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\1. MY CODE\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at router.process_params (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at router.handle (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-11 04:00:03 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\1. MY CODE\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\1. MY CODE\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at router.process_params (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at router.handle (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-11 04:00:13 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\1. MY CODE\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\1. MY CODE\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at router.process_params (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at router.handle (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-11 04:00:23 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\1. MY CODE\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\1. MY CODE\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at router.process_params (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at router.handle (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-11 04:00:33 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\1. MY CODE\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\1. MY CODE\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at router.process_params (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at router.handle (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-11 04:00:43 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\1. MY CODE\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\1. MY CODE\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at router.process_params (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at router.handle (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-11 04:00:53 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\1. MY CODE\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\1. MY CODE\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at router.process_params (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at router.handle (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-11 04:01:03 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\1. MY CODE\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\1. MY CODE\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at router.process_params (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at router.handle (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-11 04:01:13 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\1. MY CODE\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\1. MY CODE\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at router.process_params (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at router.handle (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-11 04:01:23 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\1. MY CODE\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\1. MY CODE\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at router.process_params (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at router.handle (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-11 04:01:33 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\1. MY CODE\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\1. MY CODE\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at router.process_params (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at router.handle (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-11 04:01:43 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\1. MY CODE\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\1. MY CODE\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at router.process_params (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at router.handle (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-11 04:01:53 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\1. MY CODE\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\1. MY CODE\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at router.process_params (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at router.handle (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-11 04:02:03 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\1. MY CODE\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\1. MY CODE\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at router.process_params (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at router.handle (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-11 04:02:13 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\1. MY CODE\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\1. MY CODE\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at router.process_params (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at router.handle (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+2026-07-11 04:02:23 [ERROR] [401] No token provided
+Error: No token provided
+    at createError (D:\1. MY CODE\autobib-master\autobib-master\backend\src\middleware\error.middleware.ts:30:25)
+    at authMiddleware (D:\1. MY CODE\autobib-master\autobib-master\backend\src\middleware\auth.middleware.ts:14:30)
+    at Layer.handle [as handle_request] (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:328:13)
+    at D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:286:9
+    at router.process_params (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:280:10)
+    at router.handle (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:175:3)
+    at router (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (D:\1. MY CODE\autobib-master\autobib-master\node_modules\express\lib\router\layer.js:95:5)
