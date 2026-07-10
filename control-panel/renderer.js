@@ -145,6 +145,12 @@ btnSaveConfig.addEventListener('click', async () => {
         btnSaveConfig.textContent = 'Saved!';
         btnSaveConfig.style.backgroundColor = 'var(--success)';
         appendLog('Settings saved successfully.', 'success');
+        
+        if (isRunning) {
+            appendLog('Restarting engine to apply new settings...', 'info');
+            await window.api.stopServer();
+            await window.api.startServer();
+        }
     } else {
         btnSaveConfig.textContent = 'Save Failed';
         btnSaveConfig.style.backgroundColor = 'var(--danger)';
