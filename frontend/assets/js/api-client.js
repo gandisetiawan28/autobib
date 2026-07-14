@@ -97,12 +97,27 @@ const ApiClient = (() => {
       return data;
     },
     addLink:   (url, target) => request('POST', '/mendeley/add-link', { url, target }),
+    pdfInfo:   (docId) => request('GET', `/mendeley/documents/${docId}/pdf-info`),
+    // URL langsung untuk streaming PDF — bisa dipakai di <iframe> src
+    pdfContentUrl: (fileId, filename) => {
+      const token = localStorage.getItem('autobib_token') || '';
+      const name = encodeURIComponent(filename || 'document.pdf');
+      return `${API_BASE}/mendeley/files/${fileId}/content?filename=${name}&token=${token}`;
+    },
   };
 
   // ── Citation ──────────────────────────────────────────────
   const ai = {
     generate: (mode, abstracts, custom_prompt) => request('POST', '/ai/generate', { mode, abstracts, custom_prompt }),
     fixMetadata: (documents) => request('POST', '/ai/fix-metadata', { documents }),
+  };
+
+  // ── Skills ────────────────────────────────────────────────
+  const skills = {
+    list:   () => request('GET', '/skills'),
+    add:    (body) => request('POST', '/skills', body),
+    update: (id, body) => request('PUT', `/skills/${id}`, body),
+    remove: (id) => request('DELETE', `/skills/${id}`),
   };
 
   // ── Citation ──────────────────────────────────────────────
@@ -270,7 +285,7 @@ const ApiClient = (() => {
     }
   };
 
-  return { keyPool, settings, mendeley, ai, citation, smartCitation, chat, generateStream };
+  return { keyPool, settings, mendeley, ai, citation, smartCitation, chat, generateStream, skills };
 })();
 
 window.ApiClient = ApiClient;

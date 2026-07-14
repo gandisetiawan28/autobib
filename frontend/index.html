@@ -626,6 +626,9 @@
         <span class="badge-dot"></span>
         <span class="badge-label" id="badge-label">–</span>
       </div>
+      <button class="icon-btn" id="btn-skills" title="AI Skills (Rules)" aria-label="AI Skills">
+        🧠
+      </button>
       <button class="icon-btn" id="theme-toggle" title="Toggle tema" aria-label="Toggle tema">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="12" cy="12" r="5" />
@@ -785,6 +788,15 @@
               <span class="btn-text">Edit</span></button>
             <button class="btn btn-sm btn-ghost" id="btn-fix-metadata" title="Perbaiki huruf kapital otomatis">✨ <span
                 class="btn-text">Perbaiki</span></button>
+            <button class="btn btn-sm btn-ghost" id="btn-view-pdf" title="Lihat PDF dokumen terpilih">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="9" y1="13" x2="15" y2="13"/>
+                <line x1="9" y1="17" x2="15" y2="17"/>
+              </svg>
+              <span class="btn-text">Lihat PDF</span>
+            </button>
             <button class="btn btn-sm btn-primary" id="btn-add-to-queue">
               + <span class="btn-text">Antrian</span>
             </button>
@@ -1257,7 +1269,7 @@
                 </svg>
               </button>
               <select id="chat-persona-select" class="select-sm auto-style-80" title="Pilih Opsi">
-                <option value="assistant">General Assistant</option>
+                <option value="default">General Assistant</option>
                 <option value="reviewer">Academic Reviewer</option>
                 <option value="proofreader">Proofreader</option>
               </select>
@@ -1597,6 +1609,55 @@
     </div>
   </div>
 
+  <!-- ── Skills Modal ── -->
+  <div class="modal-overlay hidden" id="skills-modal" style="z-index:9999;">
+    <div class="modal-content" style="max-width:500px; width:90%; padding:20px; display:flex; flex-direction:column; max-height:80vh;">
+      <div class="modal-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h2 style="font-size:16px; margin:0;">🧠 AI Skills & Rules</h2>
+        <button class="icon-btn" id="btn-close-skills-modal" style="width:32px; height:32px;">✕</button>
+      </div>
+      
+      <div class="modal-body" style="flex:1; overflow-y:auto; padding-right:8px;">
+        <div id="skills-list">
+          <!-- Item skills akan di-render di sini -->
+        </div>
+
+        <form id="skills-form" style="display:none; flex-direction:column; gap:12px;">
+          <input type="hidden" id="skill-id" />
+          
+          <div class="input-group" style="display:flex; flex-direction:column; gap:4px;">
+            <label class="input-label" style="font-size:12px; font-weight:600; color:var(--text-secondary);">Nama Skill <span style="color:var(--color-danger)">*</span></label>
+            <input type="text" id="skill-name" style="width:100%; padding:8px 12px; border:1px solid var(--border); border-radius:6px; background:var(--bg-elevated); color:var(--text-primary); font-size:13px; outline:none;" placeholder="Contoh: Format Heading 1" required />
+          </div>
+          
+          <div class="input-group" style="display:flex; flex-direction:column; gap:4px;">
+            <label class="input-label" style="font-size:12px; font-weight:600; color:var(--text-secondary);">Deskripsi (Opsional)</label>
+            <input type="text" id="skill-desc" style="width:100%; padding:8px 12px; border:1px solid var(--border); border-radius:6px; background:var(--bg-elevated); color:var(--text-primary); font-size:13px; outline:none;" placeholder="Tujuan skill ini..." />
+          </div>
+          
+          <div class="input-group" style="display:flex; flex-direction:column; gap:4px;">
+            <label class="input-label" style="font-size:12px; font-weight:600; color:var(--text-secondary);">Instruksi Prompt (Injection) <span style="color:var(--color-danger)">*</span></label>
+            <textarea id="skill-prompt" style="width:100%; padding:8px 12px; border:1px solid var(--border); border-radius:6px; background:var(--bg-elevated); color:var(--text-primary); min-height:100px; resize:vertical; font-family:monospace; font-size:12px; outline:none;" placeholder="Instruksi spesifik yang harus ditaati AI..." required></textarea>
+          </div>
+          
+          <label class="checkbox-label" style="margin-top:4px; display:flex; align-items:center; gap:8px; font-size:13px; color:var(--text-primary); cursor:pointer;">
+            <input type="checkbox" id="skill-active" style="width:16px; height:16px; cursor:pointer;" checked />
+            Aktifkan Skill ini
+          </label>
+
+          <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:8px;">
+            <button type="button" class="btn btn-sm btn-ghost" id="btn-cancel-skill">Batal</button>
+            <button type="submit" class="btn btn-sm btn-primary">Simpan Skill</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer" style="margin-top:16px; border-top:1px solid var(--border); padding-top:16px;">
+        <button class="btn btn-primary" id="btn-new-skill" style="width:100%;">+ Buat Skill Baru</button>
+      </div>
+    </div>
+  </div>
+
   <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
 
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -1605,6 +1666,8 @@
   <script src="assets/js/api-client.js?v=2"></script>
   <script src="assets/js/office-bridge.js?v=2"></script>
   <script src="assets/js/settings.js?v=2"></script>
+  <script src="assets/js/skills.js?v=1"></script>
+  <script src="assets/js/pdf-viewer.js?v=1"></script>
   <script src="assets/js/mendeley.js?v=2"></script>
   <script src="assets/js/ai-generate.js?v=2"></script>
   <script src="assets/js/smart-citation.js?v=2"></script>

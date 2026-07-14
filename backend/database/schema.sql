@@ -166,3 +166,20 @@ CREATE TABLE IF NOT EXISTS chat_messages (
 );
 
 CREATE INDEX IF NOT EXISTS idx_chat_messages_session ON chat_messages(session_id);
+
+-- ============================================================
+-- AI SKILLS
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS ai_skills (
+  id               TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
+  user_id          TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  name             TEXT NOT NULL,
+  description      TEXT,
+  prompt_injection TEXT NOT NULL,
+  is_active        INTEGER DEFAULT 1 CHECK(is_active IN (0, 1)),
+  created_at       TEXT DEFAULT (datetime('now')),
+  updated_at       TEXT DEFAULT (datetime('now'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_ai_skills_user ON ai_skills(user_id);

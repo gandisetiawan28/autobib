@@ -161,7 +161,10 @@ router.get('/mendeley/callback', async (req: Request, res: Response, next: NextF
 router.get('/mendeley/status', (req: Request, res: Response, next: NextFunction) => {
   try {
     const db = getDb();
-    const user = db.prepare('SELECT id FROM users LIMIT 1').get() as { id: string };
+    const user = db.prepare('SELECT id FROM users LIMIT 1').get() as { id: string } | undefined;
+    
+    if (!user) return res.json({ connected: false });
+
     const token = db
       .prepare('SELECT mendeley_profile, expires_at FROM mendeley_tokens WHERE user_id = ?')
       .get(user.id) as { mendeley_profile: string; expires_at: string } | undefined;

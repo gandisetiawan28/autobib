@@ -57,11 +57,19 @@ const OfficeBridge = (() => {
   }
 
   // ── Live Streaming Logic ──
-  let streamRange = null;
-  let streamQueue = "";
-  let isStreaming = false;
-  let hasClearedSelection = false;
-  let shouldReplaceStream = true;
+  let isForceStopped = false;
+  function forceStop() {
+    isForceStopped = true;
+    isStreaming = false;
+    streamQueue = ""; // Clear queue immediately
+  }
+  function resetForceStop() { isForceStopped = false; }
+  function getForceStopped() { return isForceStopped; }
+
+  let streamCc = null;          // range terakhir (end anchor)
+  let streamStartRange = null;   // (legacy, tidak digunakan untuk re  let shouldReplaceStream = true;
+  let streamStyleName = null;
+  let streamForceParagraphBlock = false;
   // ===== SISTEM UNDO =====
   let undoStack = {};
   
@@ -74,6 +82,7 @@ const OfficeBridge = (() => {
       // Reversal: Cari teks yang 'baru' (yang disisipkan AI), lalu timpa kembali dengan teks 'lama' (asli)
       await searchAndReplaceSelection([{
         find: action.replaced_with,
+        replace: action.original_text,
         replace: action.original_text,
         actionId: null // Jangan catat undo ini sebagai operasi yang bisa di-undo lagi
       }], true); // true = run silently/synchronously without typing effect
@@ -101,13 +110,22 @@ const OfficeBridge = (() => {
 
   let isTypingLoopRunning = false;
 
-  async function startLiveStream(replace = false) {
+  async function startLiveStream(replace = false, styleName = null, forceParagraphBlock = false) {
     streamQueue = "";
+    fullStreamedText = "";
     isStreaming = true;
     hasClearedSelection = false;
     shouldReplaceStream = replace;
-    streamRange = null;
+    streamCc = null;
+    streamStartRange = null;
+    streamInitialRange = null;
+    streamAnchorText = null;
+    streamStyleName = styleName;
+    streamForceParagraphBlock = forceParagraphBlock;
+    resetForceStop();
+
     startTypingLoop();
+    await new Promise(r => setTimeout(r, 30));
   }
 
   async function appendLiveStream(chunk) {
@@ -119,85 +137,136 @@ const OfficeBridge = (() => {
     if (isTypingLoopRunning) return;
     isTypingLoopRunning = true;
     
-    while (isStreaming || streamQueue.length > 0) {
-      if (streamQueue.length === 0) {
-        await new Promise(r => setTimeout(r, 50));
-        continue;
-      }
-      
-      // Adaptive batching: Jika antrean menumpuk karena kecepatan AI, ambil lebih banyak huruf sekaligus
-      let charsToTake = 1;
-      if (streamQueue.length > 20) charsToTake = 3;
-      if (streamQueue.length > 50) charsToTake = 8;
-      if (streamQueue.length > 150) charsToTake = streamQueue.length; 
-      
-      const textToInsert = streamQueue.substring(0, charsToTake);
-      streamQueue = streamQueue.substring(charsToTake);
-      
-      try {
-        if (!hasClearedSelection || !streamRange) {
-            await Word.run(async (ctx) => {
+    try {
+      await Word.run(async (ctx) => {
+        let initialRange = null;
+        let currentCc = null;
+        let hasCleared = false;
+        
+        while (isStreaming || streamQueue.length > 0) {
+          if (isForceStopped) {
+              streamQueue = "";
+              break;
+          }
+          if (streamQueue.length === 0) {
+            await new Promise(r => setTimeout(r, 50));
+            continue;
+          }
+          
+          // Parse ^p and ^l
+          streamQueue = streamQueue.replace(/\^p/gi, '\n').replace(/\^l/gi, '\v');
+          
+          let processLen = streamQueue.length;
+          if (streamQueue.endsWith('^') && isStreaming) {
+             processLen--;
+          }
+          
+          if (processLen === 0) {
+            await new Promise(r => setTimeout(r, 50));
+            continue;
+          }
+          
+          // Adaptive batching: Jika antrean menumpuk karena kecepatan AI, ambil lebih banyak huruf sekaligus
+          let charsToTake = 1;
+          if (processLen > 20) charsToTake = 4;
+          if (processLen > 50) charsToTake = 10;
+          if (processLen > 100) charsToTake = 25; 
+          if (processLen > 200) charsToTake = 50; 
+          
+          const textToInsert = streamQueue.substring(0, charsToTake);
+          streamQueue = streamQueue.substring(charsToTake);
+          fullStreamedText += textToInsert;
+          
+          if (!hasCleared) {
               const sel = ctx.document.getSelection();
               if (shouldReplaceStream) {
-                sel.insertText("", Word.InsertLocation.replace);
-                streamRange = sel.insertText(textToInsert, Word.InsertLocation.end);
+                currentCc = sel.insertText(textToInsert, Word.InsertLocation.replace);
               } else {
-                streamRange = sel.insertText(textToInsert, Word.InsertLocation.after);
+                currentCc = sel.insertText(textToInsert, Word.InsertLocation.after);
               }
-              streamRange.track();
-              streamRange.select('End'); // Auto-scroll to end
-              hasClearedSelection = true;
-              await ctx.sync();
-            });
-        } else {
-            await Word.run(streamRange, async (ctx) => {
-               streamRange.insertText(textToInsert, Word.InsertLocation.end);
-               streamRange.select('End'); // Auto-scroll to end
-               await ctx.sync();
-            });
+              currentCc.track();
+              initialRange = currentCc;
+              currentCc.select('End');
+              hasCleared = true;
+          } else {
+              const appended = currentCc.insertText(textToInsert, Word.InsertLocation.end);
+              appended.track();
+              
+              if (currentCc !== initialRange) {
+                  try { currentCc.untrack(); } catch (_) {}
+              }
+              currentCc = appended;
+              currentCc.select('End');
+          }
+          await ctx.sync();
+          
+          // Adaptive Delay
+          const lastChar = textToInsert.slice(-1);
+          let delay = 20; 
+          if (['.', '?', '!'].includes(lastChar)) delay = 300; 
+          else if ([',', ';', ':'].includes(lastChar)) delay = 150; 
+          else if (lastChar === '\n') delay = 400; 
+          
+          if (delay > 0) await new Promise(r => setTimeout(r, delay));
         }
-        
-        // Adaptive Delay: Mensimulasikan jeda pengetikan manusia
-        const lastChar = textToInsert.slice(-1);
-        let delay = 20; // Default: cepat
-        if (['.', '?', '!'].includes(lastChar)) delay = 300; // Jeda di akhir kalimat
-        else if ([',', ';', ':'].includes(lastChar)) delay = 150; // Jeda di tengah kalimat
-        else if (lastChar === '\n') delay = 400; // Jeda saat paragraf baru
-        
-        if (delay > 0) await new Promise(r => setTimeout(r, delay));
-        
-      } catch (err) {
-        console.error("Stream sync error:", err);
-        streamQueue = textToInsert + streamQueue; // Restore queue
-        hasClearedSelection = false;
-        streamRange = null;
-        shouldReplaceStream = false; 
-        await new Promise(r => setTimeout(r, 500));
-      }
+
+        // --- FORMATTING DI AKHIR TYPING LOOP (DALAM CONTEXT YANG SAMA) ---
+        const rawText = fullStreamedText;
+        const needsFormatting = rawText.includes('*') || rawText.includes('_') ||
+                                rawText.includes('^') || rawText.includes('~') ||
+                                !!streamStyleName || streamForceParagraphBlock;
+
+        if (needsFormatting && !isForceStopped && initialRange && currentCc) {
+            let fullRange;
+            if (initialRange === currentCc) {
+                fullRange = currentCc;
+            } else {
+                try {
+                    fullRange = initialRange.expandTo(currentCc);
+                } catch(e) {
+                    fullRange = currentCc;
+                }
+            }
+
+            // Ganti dengan plain marker dulu agar range tidak collapsed
+            const tempRange = fullRange.insertText("\u200B", Word.InsertLocation.replace);
+            await ctx.sync();
+
+            // Render ulang dengan markdown/style
+            await insertMarkdown(ctx, tempRange, rawText, Word.InsertLocation.replace, streamStyleName, streamForceParagraphBlock);
+            await ctx.sync();
+        }
+
+        // Bersihkan tracking
+        if (currentCc) {
+            try { currentCc.untrack(); } catch(_) {}
+        }
+        if (initialRange && initialRange !== currentCc) {
+            try { initialRange.untrack(); } catch(_) {}
+        }
+        await ctx.sync();
+      });
+    } catch (err) {
+      console.error("Stream sync error in startTypingLoop:", err);
+    } finally {
+      isTypingLoopRunning = false;
     }
-    isTypingLoopRunning = false;
   }
 
   async function stopLiveStream() {
-    isStreaming = false; 
+    isStreaming = false;
 
-    // Tunggu sampai loop mengetik selesai memproses sisa antrean
+    // Tunggu sampai antrian benar-benar kosong DAN loop selesai
     let retries = 0;
-    while (isTypingLoopRunning && retries < 100) { 
+    while (!isForceStopped && isTypingLoopRunning && retries < 400) {
       await new Promise(r => setTimeout(r, 50));
       retries++;
     }
 
-    if (streamRange) {
-      try {
-        await Word.run(async (ctx) => {
-          streamRange.untrack();
-          await ctx.sync();
-        });
-      } catch (err) {
-        console.error("Error finalizing stream", err);
-      }
-      streamRange = null;
+    if (isTypingLoopRunning) {
+      console.warn("Live stream typing loop timeout. Forcing stop.");
+      forceStop();
+      await new Promise(r => setTimeout(r, 300));
     }
   }
 
@@ -336,29 +405,50 @@ const OfficeBridge = (() => {
     // - find (legacy) => fallback
     const legacyRaw = (rep.find || '');
     const singleRaw = rep['find-single'] ?? '';
-    const startRaw = rep['find-start'] ?? '';
-    const endRaw = rep['find-end'] ?? '';
+    let startRaw = rep['find-start'] ?? '';
+    let endRaw = rep['find-end'] ?? '';
 
     // Decide mode & normalize anchor text
-    const mode = (startRaw && endRaw) ? 'range' : (singleRaw ? 'single' : (legacyRaw ? 'legacy' : 'none'));
+    let mode = (startRaw && endRaw) ? 'range' : (singleRaw ? 'single' : (legacyRaw ? 'legacy' : 'none'));
     if (mode === 'none') return null;
 
     const normalizeAnchor = (text) => {
       const raw = (text || '');
-      let searchText = raw.trim();
-      if (!searchText) return '';
+      let searchTextLocal = raw.trim();
+      if (!searchTextLocal) return '';
       // Normalize: NBSP + zero-width + BOM + whitespace collapse
-      searchText = searchText
+      searchTextLocal = searchTextLocal
         .replace(/[\u00A0\u200B\u200C\u200D\uFEFF]/g, ' ')
-        .replace(/[\n\r\\\*]+/g, ' ')
+        .replace(/[\n\r]+/g, ' ')   // collapse newlines only, NOT backslash/asterisk
         .replace(/\s{2,}/g, ' ')
         .trim();
 
-      return searchText;
+      return searchTextLocal;
+    };
+
+    // Helper: parse the REAL Word style name from a combined AI style string like "Heading 2;SUB-BAB 1"
+    // Word stores only the first part (the actual style name), e.g., "Heading 2"
+    const parseWordStyle = (styleStr) => {
+      if (!styleStr) return '';
+      // Split by ; or , and return the first non-empty part trimmed
+      return styleStr.split(/[;,]/).map(s => s.trim()).filter(Boolean)[0] || '';
     };
 
     const rawForBookend = mode === 'legacy' ? legacyRaw : (mode === 'single' ? singleRaw : `${startRaw}\n${endRaw}`);
     let searchText = mode === 'single' ? normalizeAnchor(singleRaw) : (mode === 'legacy' ? normalizeAnchor(legacyRaw) : '');
+
+    // Upgrade long single searches to range (bookend) search to avoid partial 250-char matching
+    if (mode !== 'range' && searchText.length > 250) {
+      mode = 'range';
+      const lines = rawForBookend.split(/[\n\r]+/).filter(l => l.trim().length > 0);
+      if (lines.length > 1) {
+         startRaw = lines[0];
+         endRaw = lines[lines.length - 1];
+      } else {
+         startRaw = rawForBookend.substring(0, 250);
+         endRaw = rawForBookend.substring(rawForBookend.length - 200);
+      }
+    }
 
     if (mode !== 'range' && !searchText) return null;
     if (mode !== 'range' && rep.target_type === 'table') {
@@ -380,7 +470,7 @@ const OfficeBridge = (() => {
     // Normalize: NBSP + zero-width + BOM + whitespace collapse
     searchText = searchText
       .replace(/[\u00A0\u200B\u200C\u200D\uFEFF]/g, ' ')
-      .replace(/[\n\r\\\*]+/g, ' ')
+      .replace(/[\n\r]+/g, ' ')   // collapse newlines only
       .replace(/\s{2,}/g, ' ')
       .trim();
 
@@ -401,25 +491,46 @@ const OfficeBridge = (() => {
 
       const filterByStyle = (items) => {
         return items.filter(item => {
-          const s = (item.style || '').toLowerCase();
+          let s = '';
+          try { s = (item.style || '').toLowerCase(); } catch (e) {}
 
           if (rep.target_style) {
-            const tStyle = rep.target_style.toLowerCase();
-            const sParts = s.split(/[,;]/).map(x => x.trim());
-            const tParts = tStyle.split(/[,;]/).map(x => x.trim());
-            const isMatch = s === tStyle || s.includes(tStyle) || (s !== '' && tStyle.includes(s)) || sParts.some(p => p !== '' && tParts.includes(p));
-            return isMatch && !isTocOrHyperlinkStyle(s);
+            // Bug fix: parse the real Word style name (first part before ;)
+            const realStyle = parseWordStyle(rep.target_style).toLowerCase();
+            return s === realStyle || s.includes(realStyle) || realStyle.includes(s);
           }
 
           return !isTocOrHyperlinkStyle(s);
         });
       };
 
+      const escapeWordSearch = (t) => t.replace(/\^(?![ptwldmn\+\-=])/gi, '^^');
+      
       const doSearch = async (text) => {
-        const searchTextLocal = text.length > 250 ? text.substring(0, 250) : text;
-        const results = searchTarget.search(searchTextLocal, { matchCase: false, ignoreSpace: true, ignorePunct: true });
-        results.load('items/style');
+        const safeText = escapeWordSearch(text);
+        const searchTextLocal = safeText.length > 250 ? safeText.substring(0, 250) : safeText;
+        let results = searchTarget.search(searchTextLocal, { matchCase: false, ignoreSpace: true, ignorePunct: true });
+        results.load(rep.target_style ? 'items, items/style' : 'items');
         await ctx.sync();
+        await new Promise(r => setTimeout(r, 100)); // jeda agar Word settle
+        
+        if (results.items.length === 0) {
+           await new Promise(r => setTimeout(r, 100));
+           results = searchTarget.search(searchTextLocal, { matchCase: false, ignoreSpace: true, ignorePunct: false });
+           results.load(rep.target_style ? 'items, items/style' : 'items');
+           await ctx.sync();
+           await new Promise(r => setTimeout(r, 100));
+        }
+        
+        if (results.items.length === 0) {
+           await new Promise(r => setTimeout(r, 150));
+           const rawText = text.length > 250 ? text.substring(0, 250) : text;
+           results = searchTarget.search(rawText, { matchCase: false, ignoreSpace: true, ignorePunct: false });
+           results.load(rep.target_style ? 'items, items/style' : 'items');
+           await ctx.sync();
+           await new Promise(r => setTimeout(r, 100));
+        }
+        
         return filterByStyle(results.items);
       };
 
@@ -439,7 +550,8 @@ const OfficeBridge = (() => {
         chunkB = chunkB.replace(/[\n\r\\\*]+/g, ' ').replace(/\s{2,}/g, ' ');
 
         if (chunkA && chunkB) {
-          const [fbA, fbB] = await Promise.all([doSearch(chunkA), doSearch(chunkB)]);
+          const fbA = await doSearch(chunkA);
+          const fbB = await doSearch(chunkB);
           if (fbA.length > mIndex && fbB.length > mIndex) {
             targetRange = fbA[mIndex].expandTo(fbB[mIndex]);
           }
@@ -479,29 +591,67 @@ const OfficeBridge = (() => {
 
     const filterByStyle = (items) => {
       return items.filter(item => {
-        const s = (item.style || '').toLowerCase();
+        let s = '';
+        try { s = (item.style || '').toLowerCase(); } catch (e) {}
 
         if (rep.target_style) {
-          const tStyle = rep.target_style.toLowerCase();
-          const sParts = s.split(/[,;]/).map(x => x.trim());
-          const tParts = tStyle.split(/[,;]/).map(x => x.trim());
-          const isMatch = s === tStyle || s.includes(tStyle) || (s !== '' && tStyle.includes(s)) || sParts.some(p => p !== '' && tParts.includes(p));
-          return isMatch && !isTocOrHyperlinkStyle(s);
+          // Bug fix: parse the real Word style name (first part before ;)
+          const realStyle = parseWordStyle(rep.target_style).toLowerCase();
+          return s === realStyle || s.includes(realStyle) || realStyle.includes(s);
         }
 
         return !isTocOrHyperlinkStyle(s);
       });
     };
 
+    const escapeWordSearch = (t) => t.replace(/\^(?![ptwldmn\+\-=])/gi, '^^');
+
     const doSearch = async (text) => {
-      const results = searchTarget.search(text, { matchCase: false, ignoreSpace: true, ignorePunct: true });
-      results.load('items/style');
+      const safeText = escapeWordSearch(text);
+      const searchTextLocal = safeText.length > 250 ? safeText.substring(0, 250) : safeText;
+      let results = searchTarget.search(searchTextLocal, { matchCase: false, ignoreSpace: true, ignorePunct: true });
+      results.load(rep.target_style ? 'items, items/style' : 'items');
       await ctx.sync();
+      await new Promise(r => setTimeout(r, 100)); // jeda agar Word settle
+
+      if (results.items.length === 0) {
+         await new Promise(r => setTimeout(r, 100));
+         results = searchTarget.search(searchTextLocal, { matchCase: false, ignoreSpace: true, ignorePunct: false });
+         results.load(rep.target_style ? 'items, items/style' : 'items');
+         await ctx.sync();
+         await new Promise(r => setTimeout(r, 100));
+      }
+
+      if (results.items.length === 0) {
+         await new Promise(r => setTimeout(r, 150));
+         const rawText = text.length > 250 ? text.substring(0, 250) : text;
+         results = searchTarget.search(rawText, { matchCase: false, ignoreSpace: true, ignorePunct: false });
+         results.load(rep.target_style ? 'items, items/style' : 'items');
+         await ctx.sync();
+         await new Promise(r => setTimeout(r, 100));
+      }
+
       return filterByStyle(results.items);
     };
 
     // 1) Exact-ish search
-    const validItems = await doSearch(searchText);
+    let validItems = await doSearch(searchText);
+    
+    // Auto-filter: if looking for a table, discard matches that aren't in a table
+    if (rep.target_type === 'table' && validItems.length > 0) {
+        for (const item of validItems) {
+            item.parentTableOrNullObject.load('isNullObject');
+        }
+        await ctx.sync();
+        const tableOnlyItems = [];
+        for (const item of validItems) {
+            if (!item.parentTableOrNullObject.isNullObject) {
+                tableOnlyItems.push(item);
+            }
+        }
+        validItems = tableOnlyItems;
+    }
+
     if (validItems.length > mIndex) {
       targetRange = validItems[mIndex];
     } else {
@@ -511,7 +661,12 @@ const OfficeBridge = (() => {
       if (parts.length >= 5 && anchorLen <= parts.length) {
         const shortAnchor = parts.slice(0, anchorLen).join(' ');
         if (shortAnchor && shortAnchor !== searchText) {
-          const shortValid = await doSearch(shortAnchor);
+          let shortValid = await doSearch(shortAnchor);
+          if (rep.target_type === 'table' && shortValid.length > 0) {
+              for (const item of shortValid) item.parentTableOrNullObject.load('isNullObject');
+              await ctx.sync();
+              shortValid = shortValid.filter(item => !item.parentTableOrNullObject.isNullObject);
+          }
           if (shortValid.length > mIndex) targetRange = shortValid[mIndex];
         }
       }
@@ -537,7 +692,15 @@ const OfficeBridge = (() => {
           chunkA = chunkA.replace(/[\n\r\\\*]+/g, ' ').replace(/\s{2,}/g, ' ');
           chunkB = chunkB.replace(/[\n\r\\\*]+/g, ' ').replace(/\s{2,}/g, ' ');
 
-          const [validA, validB] = await Promise.all([doSearch(chunkA), doSearch(chunkB)]);
+          let validA = await doSearch(chunkA);
+          let validB = await doSearch(chunkB);
+          
+          if (rep.target_type === 'table') {
+              for (const item of [...validA, ...validB]) item.parentTableOrNullObject.load('isNullObject');
+              await ctx.sync();
+              validA = validA.filter(item => !item.parentTableOrNullObject.isNullObject);
+              validB = validB.filter(item => !item.parentTableOrNullObject.isNullObject);
+          }
           if (validA.length > mIndex && validB.length > mIndex) {
             targetRange = validA[mIndex].expandTo(validB[mIndex]);
           }
@@ -550,8 +713,7 @@ const OfficeBridge = (() => {
     if (rep.target_type === 'paragraph') {
       targetRange = targetRange.paragraphs.getFirst().getRange();
     } else if (rep.target_type === 'table') {
-      // Jika AI menargetkan teks di dalam tabel, tapi ingin keluar dari tabel itu
-      // kita perlu mengambil tabel induk yang benar-benar menaungi anchor.
+      // Return table range only
       let parentTable = targetRange.parentTableOrNullObject;
       parentTable.load('isNullObject');
       await ctx.sync();
@@ -559,12 +721,13 @@ const OfficeBridge = (() => {
       if (!parentTable.isNullObject) {
         targetRange = parentTable.getRange();
       } else {
-        // Fallback untuk kompatibilitas Word/Office.js versi tertentu
         let tables = targetRange.tables;
         tables.load('items');
         await ctx.sync();
         if (tables.items.length > 0) {
           targetRange = tables.items[0].getRange();
+        } else {
+          return null; // Reject completely if not a table
         }
       }
     }
@@ -574,40 +737,74 @@ const OfficeBridge = (() => {
   /**
    * Helper to insert text with basic markdown support (*italic*, **bold**) and optional styling
    */
-  function insertMarkdown(range, text, location, styleName, forceParagraphBlock = false) {
+  async function insertMarkdown(ctx, range, text, location, styleName, forceParagraphBlock = false) {
       if (!text) return;
+      text = text.replace(/\^p/gi, '\n').replace(/\^l/gi, '\v');
 
       // Hanya masuk jalur HTML jika benar-benar ada markdown/newline.
       // forceParagraphBlock hanya mempengaruhi struktur paragraf, bukan jenis API.
       const hasMarkdown =
         text.includes('*') ||
         text.includes('\n') ||
-        text.includes('_');
+        text.includes('_') ||
+        text.includes('^') ||
+        text.includes('~');
 
       if (hasMarkdown) {
           let html = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
           html = html.replace(/\*(.*?)\*/g, '<i>$1</i>');
           html = html.replace(/_(.*?)_/g, '<i>$1</i>');
+          html = html.replace(/\^([^\^]+)\^/g, '<sup>$1</sup>');
+          html = html.replace(/~([^~]+)~/g, '<sub>$1</sub>');
           
-          let paragraphs = html.split(/\n+/).map(p => p.trim()).filter(p => p);
+          html = html.replace(/\n+$/, ''); // Hapus newline di akhir agar tidak berlebih
+          let paragraphs = html.split('\n');
           let currentRange = range;
           
           for (let i = 0; i < paragraphs.length; i++) {
-              let pText = paragraphs[i];
-              let spanHtml = `<span style="font-weight:normal; font-style:normal;">${pText}</span>`;
+              let pText = paragraphs[i].replace(/\v/g, '<br/>');
+              let spanHtml = pText.trim() !== "" ? `<span>${pText}</span>` : "";
               let parRange;
               
               if (forceParagraphBlock || i > 0) {
                   // Gunakan API native Word untuk membuat blok paragraf baru.
-                  // Tetap insertHtml di sini karena memang ada markdown/newline.
-                  let loc = (i === 0) ? location : Word.InsertLocation.after;
-                  let newPar = currentRange.insertParagraph("", loc);
-                  parRange = newPar.getRange();
-                  parRange.insertHtml(spanHtml, Word.InsertLocation.start);
+                  let parRange;
+                  
+                  // Word API insertParagraph TIDAK mendukung InsertLocation.replace.
+                  if (i === 0 && (location === Word.InsertLocation.replace || location === 'Replace')) {
+                      parRange = currentRange;
+                      parRange.insertText("", Word.InsertLocation.replace); // Bersihkan isi lama
+                      if (spanHtml !== "") {
+                          parRange.insertHtml(spanHtml, Word.InsertLocation.start);
+                      }
+                      if (styleName) {
+                          try { parRange.paragraphs.getFirst().style = styleName; } catch(e){}
+                      }
+                  } else {
+                      let loc = (i === 0) ? location : Word.InsertLocation.after;
+                      let newPar = currentRange.insertParagraph("", loc);
+                      parRange = newPar.getRange();
+                      if (spanHtml !== "") {
+                          parRange.insertHtml(spanHtml, Word.InsertLocation.start);
+                      }
+                      if (styleName) {
+                          newPar.style = styleName;
+                      }
+                  }
+                  
                   currentRange = parRange;
               } else {
-                  currentRange = currentRange.insertHtml(spanHtml, location);
+                  if (spanHtml !== "") {
+                      currentRange.insertHtml(spanHtml, location);
+                  }
                   parRange = currentRange;
+              }
+              
+              // Chunking untuk mencegah error 0x80070057 pada teks sangat panjang
+              if (i > 0 && i % 10 === 0) {
+                  currentRange.track();
+                  await ctx.sync();
+                  currentRange.untrack();
               }
               
               if (styleName) {
@@ -625,20 +822,28 @@ const OfficeBridge = (() => {
       } else {
           // Teks plain: hindari insertHtml agar Word tidak menambahkan spasi tak terlihat.
           if (forceParagraphBlock) {
-              const newPar = range.insertParagraph(text, location);
+              let newRange;
+              if (location === Word.InsertLocation.replace || location === 'Replace') {
+                  newRange = range.insertText(text, Word.InsertLocation.replace);
+              } else {
+                  newRange = range.insertParagraph(text, location);
+              }
               if (styleName) {
                   try {
-                      newPar.paragraphs.getFirst().style = styleName;
+                      if (newRange.paragraphs) {
+                          newRange.paragraphs.getFirst().style = styleName;
+                      } else {
+                          newRange.style = styleName;
+                      }
                   } catch (e) {
-                      try { newPar.style = styleName; } catch (_) {}
-                      console.warn("Gagal menerapkan style paragraf:", e);
+                      try { newRange.style = styleName; } catch (_) {}
                   }
               }
           } else {
               // Reset font properties to combat bold inheritance
               const newRange = range.insertText(text, location);
-              newRange.font.bold = false;
-              newRange.font.italic = false;
+              // newRange.font.bold = false; // Dihapus untuk mencegah hilangnya format style native secara tiba-tiba
+              // newRange.font.italic = false;
               if (styleName) {
                   try {
                       if (newRange.paragraphs) {
@@ -662,87 +867,114 @@ const OfficeBridge = (() => {
     console.log('[OfficeBridge] searchAndReplaceSelection start', { count: replacements.length });
 
     try {
-      await Word.run(async (ctx) => {
-        const searchTarget = ctx.document.body;
-        let successCount = 0;
-        let lastFailedText = "";
+      let successCount = 0;
+      let lastFailedText = "";
 
-        for (const rep of replacements) {
-          if (!rep.find || rep.replace === undefined) continue;
+      for (const rep of replacements) {
+        if (isForceStopped) break;
+        if (!rep.find && !rep['find-single'] && !rep['find-start'] || rep.replace === undefined) continue;
 
-          if (rep.replace_all) {
-            const searchText = ((rep['find-single'] ?? rep.find) || '').trim().replace(/\n/g, ' ');
-            const results = searchTarget.search(searchText, {
-              matchCase: false,
-              ignoreSpace: true,
-              ignorePunct: true
-            });
-            results.load('items');
-            await ctx.sync();
+        let doStreamReplace = false;
+        let operationSkipped = false;
+        let currentAnchorText = rep['find-single'] || rep['find-start'] || rep.find;
 
-            if (results.items.length > 0) {
-              // Jika silentUndo aktif, replace sekaligus tanpa animasi
-              if (silentUndo) {
-                for (let i = 0; i < results.items.length; i++) {
-                  insertMarkdown(results.items[i], rep.replace, Word.InsertLocation.replace, rep.style);
-                }
-                await ctx.sync();
-              } else {
-                for (let i = 0; i < results.items.length; i++) {
-                  results.items[i].select(); // Auto-scroll
-                  results.items[i].insertText("", Word.InsertLocation.replace);
+        try {
+          await Word.run(async (ctx) => {
+            const searchTarget = ctx.document.body;
+
+            if (rep.replace_all) {
+              const searchText = ((rep['find-single'] ?? rep.find) || '').trim().replace(/\n/g, ' ');
+              const results = searchTarget.search(searchText, {
+                matchCase: false,
+                ignoreSpace: true,
+                ignorePunct: true
+              });
+              results.load('items');
+              await ctx.sync();
+
+              if (results.items.length > 0) {
+                if (silentUndo) {
+                  for (let i = 0; i < results.items.length; i++) {
+                    insertMarkdown(results.items[i], rep.replace, Word.InsertLocation.replace, rep.style);
+                  }
                   await ctx.sync();
-                  // Panggil stream efek ngetik (harus lepas dari Word.run sementara)
-                  startLiveStream(false);
-                  appendLiveStream(rep.replace);
-                  await stopLiveStream();
+                  successCount++;
+                } else {
+                  results.items[0].select(); 
+                  results.items[0].insertText("", Word.InsertLocation.replace);
+                  await ctx.sync();
+                  doStreamReplace = true;
+                  successCount++;
                 }
-              }
-              successCount++;
-            } else {
-              lastFailedText = rep.find;
-            }
-          } else {
-            const targetRange = await findTargetRange(ctx, searchTarget, rep);
-            if (targetRange) {
-              if (silentUndo) {
-                insertMarkdown(targetRange, rep.replace, Word.InsertLocation.replace, rep.style);
-                await ctx.sync();
               } else {
-                targetRange.select();
-                targetRange.insertText("", Word.InsertLocation.replace); // Hapus dulu
-                await ctx.sync();
-                // Stream ngetik live
-                startLiveStream(false);
-                appendLiveStream(rep.replace);
-                await stopLiveStream();
+                lastFailedText = rep.find;
+                operationSkipped = true;
               }
-              
-              // Simpan state untuk Undo
-              if (rep.actionId !== null) {
-                const id = rep.actionId || generateId();
-                undoStack[id] = {
-                  type: 'replace',
-                  original_text: rep.find,
-                  replaced_with: rep.replace
-                };
-              }
-              
-              successCount++;
             } else {
-              lastFailedText = rep.find;
+              const targetRange = await findTargetRange(ctx, searchTarget, rep);
+              if (targetRange) {
+                if (silentUndo) {
+                  await insertMarkdown(ctx, targetRange, rep.replace, Word.InsertLocation.replace, rep.style);
+                  await ctx.sync();
+                  successCount++;
+                } else {
+                  targetRange.select();
+                  targetRange.insertText("", Word.InsertLocation.replace); // Hapus dulu
+                  await ctx.sync();
+                  await new Promise(r => setTimeout(r, 600)); // Beri jeda visual perpindahan kursor
+                  doStreamReplace = true;
+                  successCount++;
+                }
+                
+                if (rep.actionId !== null) {
+                  const id = rep.actionId || generateId();
+                  undoStack[id] = {
+                    type: 'replace',
+                    original_text: rep.find,
+                    replaced_with: rep.replace
+                  };
+                }
+              } else {
+                lastFailedText = currentAnchorText;
+                operationSkipped = true;
+              }
             }
+          });
+        } catch (err) {
+          operationSkipped = true;
+          lastFailedText = currentAnchorText;
+          if (err.code === 0x80070057 || err.message?.includes('0x80070057') || err.message?.includes('InvalidArgument') || err.message?.includes('Invalid parameter')) {
+              console.error(`Operasi gagal: anchor '${currentAnchorText}' tidak ditemukan atau tidak valid (0x80070057).`);
+          } else {
+              console.error(`Operasi gagal pada anchor '${currentAnchorText}':`, err);
+          }
+          if (rep.continueOnError === false) {
+              throw err;
           }
         }
 
-        if (successCount === 0 && lastFailedText) {
-          throw new Error(
-            `Target teks tidak ditemukan: "${lastFailedText}". JANGAN gunakan operasi replace/delete untuk memodifikasi struktur TABEL. Jika Anda ingin mengedit isi tabel, gunakan tool 'table' untuk membuat ulang seluruh tabel tersebut.`
-          );
+        if (operationSkipped) {
+            console.warn(`Anchor '${lastFailedText}' tidak ditemukan, operasi dilewati.`);
+            if (rep.continueOnError === false) {
+                throw new Error(`Anchor '${lastFailedText}' tidak ditemukan, membatalkan sisa operasi multi.`);
+            }
+            continue;
         }
 
-        await ctx.sync();
-      });
+        if (doStreamReplace) {
+          const isBlock = rep.target_type === 'paragraph' || rep.target_type === 'heading';
+          const styleName = rep.style || null;
+          await startLiveStream(true, styleName, isBlock);
+          await appendLiveStream(rep.replace);
+          await stopLiveStream();
+        }
+      }
+
+      if (successCount === 0 && lastFailedText) {
+        throw new Error(
+          `Target teks tidak ditemukan: "${lastFailedText}". JANGAN gunakan operasi replace/delete untuk memodifikasi struktur TABEL. Jika Anda ingin mengedit isi tabel, gunakan tool 'table' untuk membuat ulang seluruh tabel tersebut.`
+        );
+      }
     } catch (err) {
       console.error('[OfficeBridge] searchAndReplaceSelection failed:', err);
       throw new Error(`searchAndReplaceSelection failed: ${err?.message || err}`);
@@ -754,31 +986,63 @@ const OfficeBridge = (() => {
    */
   async function deleteSelection(deletions) {
     if (!_isReady || !deletions || !deletions.length) return;
-    await Word.run(async (ctx) => {
-      const searchTarget = ctx.document.body;
-      for (const rep of deletions) {
-        const hasAnchor =
-          (rep.find && String(rep.find).trim().length > 0) ||
-          (rep['find-single'] && String(rep['find-single']).trim().length > 0) ||
-          (rep['find-start'] && String(rep['find-start']).trim().length > 0) ||
-          (rep['find-end'] && String(rep['find-end']).trim().length > 0);
+    let successCount = 0;
+    let lastFailedText = "";
+    
+    for (const rep of deletions) {
+      if (isForceStopped) break;
+      const hasAnchor =
+        (rep.find && String(rep.find).trim().length > 0) ||
+        (rep['find-single'] && String(rep['find-single']).trim().length > 0) ||
+        (rep['find-start'] && String(rep['find-start']).trim().length > 0) ||
+        (rep['find-end'] && String(rep['find-end']).trim().length > 0);
 
-        if (!hasAnchor) continue;
+      if (!hasAnchor) continue;
+      let currentAnchorText = rep['find-single'] || rep['find-start'] || rep.find || '';
+      let operationSkipped = false;
 
-        const targetRange = await findTargetRange(ctx, searchTarget, rep);
-        if (targetRange) {
-           if (rep.target_type === 'paragraph') {
-               const p = targetRange.paragraphs.getFirst();
-               p.delete();
-           } else if (rep.target_type === 'table') {
-               targetRange.delete();
-           } else {
-               targetRange.insertText('', Word.InsertLocation.replace);
-           }
-        }
+      try {
+        await Word.run(async (ctx) => {
+          const searchTarget = ctx.document.body;
+          const targetRange = await findTargetRange(ctx, searchTarget, rep);
+          if (targetRange) {
+             if (rep.target_type === 'paragraph') {
+                 const p = targetRange.paragraphs.getFirst();
+                 p.delete();
+             } else if (rep.target_type === 'table') {
+                 targetRange.delete();
+             } else {
+                 targetRange.insertText('', Word.InsertLocation.replace);
+             }
+             await ctx.sync();
+             successCount++;
+          } else {
+             lastFailedText = currentAnchorText;
+             operationSkipped = true;
+          }
+        });
+      } catch (err) {
+          operationSkipped = true;
+          lastFailedText = currentAnchorText;
+          if (err.code === 0x80070057 || err.message?.includes('0x80070057') || err.message?.includes('InvalidArgument')) {
+              console.warn(`Anchor '${currentAnchorText}' tidak valid. Operasi dilewati.`);
+          } else {
+              console.error(`Operasi gagal pada anchor '${currentAnchorText}':`, err);
+          }
+          if (rep.continueOnError === false) throw err;
       }
-      await ctx.sync();
-    });
+      
+      if (operationSkipped) {
+          console.warn(`Anchor '${lastFailedText}' tidak ditemukan, operasi dilewati.`);
+          if (rep.continueOnError === false) {
+              throw new Error(`Anchor '${lastFailedText}' tidak ditemukan, membatalkan sisa operasi multi.`);
+          }
+      }
+    }
+    
+    if (successCount === 0 && lastFailedText) {
+      throw new Error(`Target teks tidak ditemukan untuk dihapus: "${lastFailedText}"`);
+    }
   }
 
   /**
@@ -786,24 +1050,55 @@ const OfficeBridge = (() => {
    */
   async function addCommentSelection(comments) {
     if (!_isReady || !comments || !comments.length) return;
-    await Word.run(async (ctx) => {
-      const searchTarget = ctx.document.body;
-      for (const rep of comments) {
-        const hasAnchor =
-          (rep.find && String(rep.find).trim().length > 0) ||
-          (rep['find-single'] && String(rep['find-single']).trim().length > 0) ||
-          (rep['find-start'] && String(rep['find-start']).trim().length > 0) ||
-          (rep['find-end'] && String(rep['find-end']).trim().length > 0);
+    let successCount = 0;
+    let lastFailedText = "";
+    
+    for (const rep of comments) {
+      const hasAnchor =
+        (rep.find && String(rep.find).trim().length > 0) ||
+        (rep['find-single'] && String(rep['find-single']).trim().length > 0) ||
+        (rep['find-start'] && String(rep['find-start']).trim().length > 0) ||
+        (rep['find-end'] && String(rep['find-end']).trim().length > 0);
 
-        if (!hasAnchor || !rep.comment) continue;
+      if (!hasAnchor || !rep.comment) continue;
+      let currentAnchorText = rep['find-single'] || rep['find-start'] || rep.find || '';
+      let operationSkipped = false;
 
-        const targetRange = await findTargetRange(ctx, searchTarget, rep);
-        if (targetRange) {
-           targetRange.insertComment(rep.comment);
-        }
+      try {
+        await Word.run(async (ctx) => {
+          const searchTarget = ctx.document.body;
+          const targetRange = await findTargetRange(ctx, searchTarget, rep);
+          if (targetRange) {
+             targetRange.insertComment(rep.comment);
+             await ctx.sync();
+             successCount++;
+          } else {
+             lastFailedText = currentAnchorText;
+             operationSkipped = true;
+          }
+        });
+      } catch (err) {
+          operationSkipped = true;
+          lastFailedText = currentAnchorText;
+          if (err.code === 0x80070057 || err.message?.includes('0x80070057') || err.message?.includes('InvalidArgument')) {
+              console.warn(`Anchor '${currentAnchorText}' tidak valid. Operasi dilewati.`);
+          } else {
+              console.error(`Operasi gagal pada anchor '${currentAnchorText}':`, err);
+          }
+          if (rep.continueOnError === false) throw err;
       }
-      await ctx.sync();
-    });
+      
+      if (operationSkipped) {
+          console.warn(`Anchor '${lastFailedText}' tidak ditemukan, operasi dilewati.`);
+          if (rep.continueOnError === false) {
+              throw new Error(`Anchor '${lastFailedText}' tidak ditemukan, membatalkan sisa operasi multi.`);
+          }
+      }
+    }
+    
+    if (successCount === 0 && lastFailedText) {
+      throw new Error(`Target teks tidak ditemukan untuk dikomentari: "${lastFailedText}"`);
+    }
   }
 
   /**
@@ -811,84 +1106,133 @@ const OfficeBridge = (() => {
    */
   async function insertTextAtTarget(insertions) {
     if (!_isReady || !insertions || !insertions.length) return;
-    await Word.run(async (ctx) => {
-      // Use the whole body to search so it finds text anywhere in the document
-      const body = ctx.document.body;
-      let successCount = 0;
-      let lastFailedText = "";
+    let successCount = 0;
+    let lastFailedText = "";
+    
+    for (const req of insertions) {
+      if (!req.insert) continue;
       
-      for (const req of insertions) {
-        if (!req.insert) continue;
-        
-        // Fitur baru: Insert di awal atau akhir dokumen tanpa anchor text
-        if (req.location === 'start' || req.target === 'start') {
-           insertMarkdown(body, req.insert.trim() + "\n", Word.InsertLocation.start, req.style);
-           successCount++;
-           continue;
-        }
-        if (req.location === 'end' || req.target === 'end') {
-           insertMarkdown(body, "\n" + req.insert.trim(), Word.InsertLocation.end, req.style);
-           successCount++;
-           continue;
-        }
-        
-        // Resolve target text/range anchors (legacy + new fields)
-        // - if req.after/before provided => treat as before/after anchor (legacy behavior)
-        // - if req has find-single => pass it through
-        // - if req has find-start/find-end => pass them through
-        // - fallback to legacy req.find
-        let mockRep = {
-          match_index: req.match_index,
-          target_style: req.target_style
-        };
-        // Tambahkan target_type ke mockRep agar findTargetRange bisa menggunakannya
-        if (req.target_type) {
-          mockRep.target_type = req.target_type;
-        }
+      let currentAnchorText = req.after || req.before || req['find-single'] || req['find-start'] || req.find || '';
+      let operationSkipped = false;
+      let doStreamInsert = false;
+      let forceBlock = req.target_type === 'paragraph' || req.new_line === true || req.target_type === 'table';
 
-        // Keep behavior for after/before (insert tool already uses after/before directly)
-        if (req.after || req.before) {
-          let targetText = req.after || req.before;
-          if (!targetText) continue;
-          mockRep.find = targetText.replace(/\|/g, '');
-        } else if (req['find-single'] || req.find || req['find-start']) {
-          if (req['find-single']) mockRep['find-single'] = String(req['find-single']).replace(/\|/g, '');
-          if (req['find-start']) mockRep['find-start'] = String(req['find-start']).replace(/\|/g, '');
-          if (req['find-end']) mockRep['find-end'] = String(req['find-end']).replace(/\|/g, '');
-          if (!mockRep['find-single'] && !mockRep['find-start'] && !mockRep['find-end'] && req.find) {
-            mockRep.find = String(req.find).replace(/\|/g, '');
+      try {
+        await Word.run(async (ctx) => {
+          const body = ctx.document.body;
+          
+          if (req.location === 'start' || req.target === 'start') {
+             let newRange = body.insertParagraph("", Word.InsertLocation.start);
+             newRange.style = req.style || 'Normal';
+             newRange.select();
+             if (req.actionId !== null) {
+               undoStack[req.actionId || generateId()] = { type: 'insert', inserted_text: req.insert.trim() };
+             }
+             await ctx.sync();
+             doStreamInsert = true;
+             successCount++;
+             return;
           }
-        } else {
-          let targetText = req.find;
-          if (!targetText) continue;
-          mockRep.find = targetText.replace(/\|/g, '');
-        }
-        
-        const targetRange = await findTargetRange(ctx, body, mockRep);
-        
-        if (targetRange) {
-          // Normalisasi: jika input berniat membuat paragraf baru (new_line/forceParagraphBlock),
-          // jangan biarkan interpretasi "table" menarget sel/area tabel.
-
-
-          let forceBlock = req.target_type === 'paragraph' || req.new_line === true || req.target_type === 'table';
-          if (req.after) {
-            insertMarkdown(targetRange, req.insert.trim(), Word.InsertLocation.after, req.style, forceBlock);
-          } else if (req.before || req.find) {
-            insertMarkdown(targetRange, req.insert.trim(), Word.InsertLocation.before, req.style, forceBlock);
+          if (req.location === 'end' || req.target === 'end') {
+             let newRange = body.insertParagraph("", Word.InsertLocation.end);
+             newRange.style = req.style || 'Normal';
+             newRange.select();
+             if (req.actionId !== null) {
+               undoStack[req.actionId || generateId()] = { type: 'insert', inserted_text: req.insert.trim() };
+             }
+             await ctx.sync();
+             doStreamInsert = true;
+             successCount++;
+             return;
           }
-          successCount++;
-        } else {
-          lastFailedText = req.find.substring(0, 50);
-        }
+          
+          let mockRep = {
+            match_index: req.match_index,
+            target_style: req.target_style
+          };
+          if (req.target_type) {
+            mockRep.target_type = req.target_type;
+          }
+
+          if (req.after || req.before) {
+            let targetText = req.after || req.before;
+            if (!targetText) return;
+            mockRep.find = targetText.replace(/\|/g, '');
+          } else if (req['find-single'] || req.find || req['find-start']) {
+            if (req['find-single']) mockRep['find-single'] = String(req['find-single']).replace(/\|/g, '');
+            if (req['find-start']) mockRep['find-start'] = String(req['find-start']).replace(/\|/g, '');
+            if (req['find-end']) mockRep['find-end'] = String(req['find-end']).replace(/\|/g, '');
+            if (!mockRep['find-single'] && !mockRep['find-start'] && !mockRep['find-end'] && req.find) {
+              mockRep.find = String(req.find).replace(/\|/g, '');
+            }
+          } else {
+            let targetText = req.find;
+            if (!targetText) return;
+            mockRep.find = targetText.replace(/\|/g, '');
+          }
+          
+          const targetRange = await findTargetRange(ctx, body, mockRep);
+          
+          if (targetRange) {
+            let newRange;
+            let loc = req.after ? Word.InsertLocation.after : Word.InsertLocation.before;
+            
+            if (forceBlock) {
+              newRange = targetRange.insertParagraph("", loc);
+              newRange.style = req.style || 'Normal'; // Mencegah mewarisi style numbering dari paragraf sebelumnya
+            } else {
+              newRange = targetRange.insertText("", loc);
+              if (req.style) {
+                 try { newRange.style = req.style; } catch(e) {}
+              }
+            }
+            
+            newRange.select();
+            if (req.actionId !== null) {
+              undoStack[req.actionId || generateId()] = { type: 'insert', inserted_text: req.insert.trim() };
+            }
+            await ctx.sync();
+            await new Promise(r => setTimeout(r, 600)); // Beri jeda visual perpindahan kursor
+            doStreamInsert = true;
+            successCount++;
+          } else {
+            lastFailedText = currentAnchorText.substring(0, 50);
+            operationSkipped = true;
+          }
+        });
+      } catch (err) {
+          operationSkipped = true;
+          lastFailedText = currentAnchorText.substring(0, 50);
+          if (err.code === 0x80070057 || err.message?.includes('0x80070057') || err.message?.includes('InvalidArgument')) {
+              console.warn(`Anchor '${lastFailedText}' tidak valid. Operasi dilewati.`);
+          } else {
+              console.error(`Operasi gagal pada anchor '${lastFailedText}':`, err);
+          }
+          if (req.continueOnError === false) throw err;
       }
       
-      if (successCount === 0 && lastFailedText) {
-         throw new Error(`Target teks tidak ditemukan di dokumen: "${lastFailedText}". Pastikan teks benar-benar ada di dokumen Word (jangan menyertakan format markdown seperti '|').`);
+      if (operationSkipped) {
+          console.warn(`Anchor '${lastFailedText}' tidak ditemukan di dokumen, operasi dilewati.`);
+          if (req.continueOnError === false) {
+              throw new Error(`Anchor '${lastFailedText}' tidak ditemukan, membatalkan sisa operasi multi.`);
+          }
+          continue;
       }
-      
-      await ctx.sync();
-    });
+
+      if (doStreamInsert) {
+          const styleName = req.style || null;
+          const isBlock = req.target_type === 'paragraph' || req.target_type === 'heading' || req.new_line;
+          const insertStr = req.insert.trim();
+
+          await startLiveStream(true, styleName, isBlock);
+          await appendLiveStream(insertStr);
+          await stopLiveStream();
+      }
+    }
+    
+    if (successCount === 0 && lastFailedText) {
+       throw new Error(`Target teks tidak ditemukan di dokumen: "${lastFailedText}". Pastikan teks benar-benar ada di dokumen Word (jangan menyertakan format markdown seperti '|').`);
+    }
   }
 
   /**
@@ -896,24 +1240,55 @@ const OfficeBridge = (() => {
    */
   async function highlightSelection(highlights) {
     if (!_isReady || !highlights || !highlights.length) return;
-    await Word.run(async (ctx) => {
-      const searchTarget = ctx.document.body;
-      for (const rep of highlights) {
-        const hasAnchor =
-          (rep.find && String(rep.find).trim().length > 0) ||
-          (rep['find-single'] && String(rep['find-single']).trim().length > 0) ||
-          (rep['find-start'] && String(rep['find-start']).trim().length > 0) ||
-          (rep['find-end'] && String(rep['find-end']).trim().length > 0);
+    let successCount = 0;
+    let lastFailedText = "";
+    
+    for (const rep of highlights) {
+      const hasAnchor =
+        (rep.find && String(rep.find).trim().length > 0) ||
+        (rep['find-single'] && String(rep['find-single']).trim().length > 0) ||
+        (rep['find-start'] && String(rep['find-start']).trim().length > 0) ||
+        (rep['find-end'] && String(rep['find-end']).trim().length > 0);
 
-        if (!hasAnchor || !rep.color) continue;
+      if (!hasAnchor || !rep.color) continue;
+      let currentAnchorText = rep['find-single'] || rep['find-start'] || rep.find || '';
+      let operationSkipped = false;
 
-        const targetRange = await findTargetRange(ctx, searchTarget, rep);
-        if (targetRange) {
-           targetRange.font.highlightColor = rep.color;
-        }
+      try {
+        await Word.run(async (ctx) => {
+          const searchTarget = ctx.document.body;
+          const targetRange = await findTargetRange(ctx, searchTarget, rep);
+          if (targetRange) {
+             targetRange.font.highlightColor = rep.color;
+             await ctx.sync();
+             successCount++;
+          } else {
+             lastFailedText = currentAnchorText;
+             operationSkipped = true;
+          }
+        });
+      } catch (err) {
+          operationSkipped = true;
+          lastFailedText = currentAnchorText;
+          if (err.code === 0x80070057 || err.message?.includes('0x80070057') || err.message?.includes('InvalidArgument')) {
+              console.warn(`Anchor '${currentAnchorText}' tidak valid. Operasi dilewati.`);
+          } else {
+              console.error(`Operasi gagal pada anchor '${currentAnchorText}':`, err);
+          }
+          if (rep.continueOnError === false) throw err;
       }
-      await ctx.sync();
-    });
+      
+      if (operationSkipped) {
+          console.warn(`Anchor '${lastFailedText}' tidak ditemukan, operasi dilewati.`);
+          if (rep.continueOnError === false) {
+              throw new Error(`Anchor '${lastFailedText}' tidak ditemukan, membatalkan sisa operasi multi.`);
+          }
+      }
+    }
+    
+    if (successCount === 0 && lastFailedText) {
+      throw new Error(`Target teks tidak ditemukan untuk di-highlight: "${lastFailedText}"`);
+    }
   }
 
   /**
@@ -975,7 +1350,7 @@ const OfficeBridge = (() => {
         htmlTable += '</tr>';
     });
     
-    htmlTable += '</table><p style="margin: 12px 0;">&nbsp;</p>'; // Tambah spasi paragraf di akhir agar tabel tidak menempel
+    htmlTable += '</table>'; 
     
     await Word.run(async (ctx) => {
       let newRange;
@@ -1029,13 +1404,9 @@ const OfficeBridge = (() => {
               try {
                   const tbl = tables.items[0];
                   
-                  // AutoFit ke konten agar lebar kolom proporsional dan lebih rapi
-                  tbl.autoFitContents();
-                  
                   if (tableCommand.style) {
                       tbl.style = tableCommand.style;
                   } else {
-                      // Fallback style rapi jika AI tidak memberikan
                       tbl.style = "Grid Table 1 Light";
                   }
                   
@@ -1216,41 +1587,76 @@ const OfficeBridge = (() => {
    */
   async function formatSelection(formats) {
     if (!_isReady || !formats || !formats.length) return;
-    await Word.run(async (ctx) => {
-      const searchTarget = ctx.document.body;
-      for (const rep of formats) {
-        const hasAnchor =
-          (rep.find && String(rep.find).trim().length > 0) ||
-          (rep['find-single'] && String(rep['find-single']).trim().length > 0) ||
-          (rep['find-start'] && String(rep['find-start']).trim().length > 0) ||
-          (rep['find-end'] && String(rep['find-end']).trim().length > 0);
+    let successCount = 0;
+    let lastFailedText = "";
+    
+    for (const rep of formats) {
+      const hasAnchor =
+        (rep.find && String(rep.find).trim().length > 0) ||
+        (rep['find-single'] && String(rep['find-single']).trim().length > 0) ||
+        (rep['find-start'] && String(rep['find-start']).trim().length > 0) ||
+        (rep['find-end'] && String(rep['find-end']).trim().length > 0);
 
-        if (!hasAnchor || !rep.apply) continue;
+      if (!hasAnchor || !rep.apply) continue;
+      let currentAnchorText = rep['find-single'] || rep['find-start'] || rep.find || '';
+      let operationSkipped = false;
 
-        let targetRange = await findTargetRange(ctx, searchTarget, rep);
-        if (targetRange) {
-           if (rep.target) {
-              const subSearch = targetRange.search(rep.target, { matchCase: true, matchWholeWord: false });
-              subSearch.load('items');
-              await ctx.sync();
-              if (subSearch.items.length > 0) {
-                 targetRange = subSearch.items[0];
-              }
-           }
-           
-           const font = targetRange.font;
-           if (rep.apply === 'subscript') font.subscript = true;
-           if (rep.apply === 'superscript') font.superscript = true;
-           if (rep.apply === 'bold') font.bold = true;
-           if (rep.apply === 'italic') font.italic = true;
-           if (rep.apply === 'unsubscript') font.subscript = false;
-           if (rep.apply === 'unsuperscript') font.superscript = false;
-           if (rep.apply === 'unbold') font.bold = false;
-           if (rep.apply === 'unitalic') font.italic = false;
-        }
+      try {
+        await Word.run(async (ctx) => {
+          const searchTarget = ctx.document.body;
+          let targetRange = await findTargetRange(ctx, searchTarget, rep);
+          if (targetRange) {
+             if (rep.target) {
+                const safeTarget = rep.target.replace(/\^(?![ptwldmn\+\-=])/gi, '^^');
+                const subSearch = targetRange.search(safeTarget, { matchCase: true, matchWholeWord: false });
+                subSearch.load('items');
+                await ctx.sync();
+                if (subSearch.items.length > 0) {
+                   targetRange = subSearch.items[0];
+                } else {
+                   // Jika target tidak ditemukan di dalam teks, abaikan format ini
+                   return;
+                }
+             }
+             
+             const font = targetRange.font;
+             if (rep.apply === 'subscript') font.subscript = true;
+             if (rep.apply === 'superscript') font.superscript = true;
+             if (rep.apply === 'bold') font.bold = true;
+             if (rep.apply === 'italic') font.italic = true;
+             if (rep.apply === 'unsubscript') font.subscript = false;
+             if (rep.apply === 'unsuperscript') font.superscript = false;
+             if (rep.apply === 'unbold') font.bold = false;
+             if (rep.apply === 'unitalic') font.italic = false;
+             await ctx.sync();
+             successCount++;
+          } else {
+             lastFailedText = currentAnchorText;
+             operationSkipped = true;
+          }
+        });
+      } catch (err) {
+          operationSkipped = true;
+          lastFailedText = currentAnchorText;
+          if (err.code === 0x80070057 || err.message?.includes('0x80070057') || err.message?.includes('InvalidArgument')) {
+              console.warn(`Anchor '${currentAnchorText}' tidak valid. Operasi dilewati.`);
+          } else {
+              console.error(`Operasi gagal pada anchor '${currentAnchorText}':`, err);
+          }
+          if (rep.continueOnError === false) throw err;
       }
-      await ctx.sync();
-    });
+      
+      if (operationSkipped) {
+          console.warn(`Anchor '${lastFailedText}' tidak ditemukan, operasi dilewati.`);
+          if (rep.continueOnError === false) {
+              throw new Error(`Anchor '${lastFailedText}' tidak ditemukan, membatalkan sisa operasi multi.`);
+          }
+      }
+    }
+    
+    if (successCount === 0 && lastFailedText) {
+       throw new Error(`Target teks tidak ditemukan untuk diformat: "${lastFailedText}". Pastikan teks benar-benar ada.`);
+    }
   }
 
   function htmlToMarkdown(htmlString) {
@@ -1344,14 +1750,14 @@ const OfficeBridge = (() => {
         
         let lines = [];
         paragraphs.items.forEach(p => {
-            let t = p.text.replace(/[\r\n]+$/, '');
+            let t = p.text.replace(/[\r\n]+$/, '').replace(/\u000B|\v/g, '^l');
             if (t.trim() === '') {
-                lines.push('');
+                lines.push('^p');
             } else {
                 if (p.style && p.style !== 'Normal') {
-                    lines.push(`[STYLE: ${p.style}]\n${t}`);
+                    lines.push(`[STYLE: ${p.style}]\n${t}^p`);
                 } else {
-                    lines.push(t);
+                    lines.push(`${t}^p`);
                 }
             }
         });
@@ -1377,7 +1783,7 @@ const OfficeBridge = (() => {
                     for (let k = 0; k < cLines.length; k++) {
                         if (pIndex >= lines.length) { match = false; break; }
                         let lineText = lines[pIndex].replace(/^\[STYLE: .*?\][\r\n]+/, '');
-                        let cleanLine = lineText.replace(/[\u0000-\u001F\u007F-\u009F\u200B]/g, "").trim();
+                        let cleanLine = lineText.replace(/\^p$/g, '').replace(/[\u0000-\u001F\u007F-\u009F\u200B]/g, "").trim();
                         let cleanCellLine = cLines[k].replace(/[\u0000-\u001F\u007F-\u009F\u200B]/g, "").trim();
                         if (cleanLine !== cleanCellLine) {
                             match = false;
@@ -1409,7 +1815,17 @@ const OfficeBridge = (() => {
         text = lines.join('\n');
       });
     } catch (err) {
-      console.warn("Error getting all text:", err);
+      console.warn("Error getting all text with formatting, trying fallback:", err);
+      try {
+        await Word.run(async (ctx) => {
+          const paragraphs = ctx.document.body.paragraphs;
+          paragraphs.load("text");
+          await ctx.sync();
+          text = paragraphs.items.map(p => p.text).join('\n');
+        });
+      } catch (fallbackErr) {
+        console.error("Fallback to get simple text also failed:", fallbackErr);
+      }
     }
     return text;
   }
@@ -1492,14 +1908,14 @@ const OfficeBridge = (() => {
         
         let lines = [];
         paragraphs.items.forEach(p => {
-            let t = p.text.replace(/[\r\n]+$/, '');
+            let t = p.text.replace(/[\r\n]+$/, '').replace(/\u000B|\v/g, '^l');
             if (t.trim() === '') {
-                lines.push('');
+                lines.push('^p');
             } else {
                 if (p.style && p.style !== 'Normal') {
-                    lines.push(`[STYLE: ${p.style}]\n${t}`);
+                    lines.push(`[STYLE: ${p.style}]\n${t}^p`);
                 } else {
-                    lines.push(t);
+                    lines.push(`${t}^p`);
                 }
             }
         });
@@ -1961,7 +2377,8 @@ const OfficeBridge = (() => {
     startLiveStream, stopLiveStream, appendLiveStream,
     searchAndReplaceSelection, addCommentSelection, highlightSelection, insertTableSelection, editTableSelection, formatSelection, deleteSelection,
     insertTextAtTarget, extractMendeleyCitations, insertBibliography, updateBibliography, hasBibliography, stripCitationFormatting,
-    debugContentControls, undoAction, addUndoRecord, findTargetRange, generateId
+    debugContentControls, undoAction, addUndoRecord, findTargetRange, generateId,
+    forceStop, resetForceStop, getForceStopped
   };
 })();
 

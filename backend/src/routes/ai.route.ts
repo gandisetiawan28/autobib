@@ -174,16 +174,75 @@ router.post('/fix-metadata', async (req: AuthRequest, res: Response, next: NextF
 
     const systemInstruction = `You are an academic metadata fixer. Here is a JSON array of document metadata.
 Many of them have ALL CAPS titles, incorrectly categorized types, incorrectly formatted author names, or missing volume/issue details that might be stuck inside the title or source fields.
-We have provided comprehensive context fields like 'year', 'type', 'source', 'volume', 'issue', 'identifiers', and 'abstract' (if available) to help you accurately correct the document metadata.
+We have provided comprehensive context fields like 'year', 'type', 'source', 'volume', 'issue', 'identifiers', 'abstract', and 'pdf_text' (first 3 pages of the document, if available) to help you accurately correct the document metadata.
 
 YOUR TASKS:
 1. Fix the capitalization for the 'title' and 'authors' fields using standard Title Case rules (capitalize main words, keep conjunctions like 'and', 'di', 'ke', 'dari', 'yang', 'untuk', 'pada', 'terhadap' lowercase unless they start the title).
-2. CLEAN THE TITLE: Very often, the 'title' field incorrectly contains the Journal Name, Publisher, or "Volume/Issue" text at the beginning (e.g. "Jurnal Riset Multidisiplin Edukasi PERAN PELATIHAN..."). You must REMOVE this irrelevant prefix so that ONLY the actual research title remains.
+2. CLEAN THE TITLE: Very often, the 'title' field incorrectly contains the Journal Name, Publisher, or "Volume/Issue" text at the beginning (e.g. "Jurnal Riset Multidisiplin Edukasi PERAN PELATIHAN..."). You must REMOVE this irrelevant prefix so that ONLY the actual research title remains. You can cross-reference with 'pdf_text' to confirm the real title.
 3. FIX AUTHORS FORMAT: Ensure that for each author, 'last_name' strictly contains ONLY the family name (usually a single word, the very last part of their full name), and 'first_name' contains all the preceding given names.
-4. FIX DOCUMENT TYPE & METADATA: If the 'type' seems incorrect based on the context, change it to the correct type. Supported types: 'journal', 'book', 'book_section', 'case', 'computer_program', 'conference_proceedings', 'encyclopedia_article', 'film', 'hearing', 'magazine_article', 'newspaper_article', 'patent', 'report', 'statute', 'television_broadcast', 'thesis', 'generic', 'web_page', 'working_paper'. CRITICAL: If the 'source' is a news website or blog (e.g., 'detikfinance', 'kompas', 'tribun', 'medium'), you MUST set the type to 'web_page' and NEVER to 'journal'. If you extract a volume, issue, or year from the dirty title or abstract, you may add/correct the 'volume', 'issue', 'source', or 'year' fields.
+4. FIX DOCUMENT TYPE & METADATA: If the 'type' seems incorrect based on the context, change it to the correct type. Supported types: 'journal', 'book', 'book_section', 'case', 'computer_program', 'conference_proceedings', 'encyclopedia_article', 'film', 'hearing', 'magazine_article', 'newspaper_article', 'patent', 'report', 'statute', 'television_broadcast', 'thesis', 'generic', 'web_page', 'working_paper'. CRITICAL: If the 'source' is a news website or blog (e.g., 'detikfinance', 'kompas', 'tribun', 'medium'), you MUST set the type to 'web_page' and NEVER to 'journal'. If you extract a volume, issue, or year from the dirty title, abstract, or pdf_text, you may add/correct the 'volume', 'issue', 'source', or 'year' fields.
 
-Return a JSON array of exactly the same length. For each item, you MUST return the 'id' field, PLUS any fields that you have corrected or added (e.g. 'title', 'authors', 'type', 'volume', 'issue', 'source', 'year'). You do not need to return fields that you did not change, except 'id'.
-DO NOT return markdown, only the raw JSON array.`;
+Return a JSON object with a single key "documents" containing an array of exactly the same length. For each item, you MUST return the 'id' field, PLUS any fields that you have corrected or added (e.g. 'title', 'authors', 'type', 'volume', 'issue', 'source', 'year'). You do not need to return fields that you did not change, except 'id'.
+DO NOT return markdown, only the raw JSON object.`;
+
+    // Fetch PDF text for each document
+    let token = '';
+    try {
+      const { getMendeleyToken } = await import('./mendeley.route');
+      token = await getMendeleyToken(req.userId!);
+    } catch (e) {
+      // Ignore if mendeley not connected, we just won't get PDF text
+    }
+
+    let pdfParseLib: any;
+    try {
+      pdfParseLib = await import('pdf-parse');
+    } catch (e) {
+      console.warn('pdf-parse not available');
+    }
+
+    if (token && pdfParseLib && pdfParseLib.PDFParse) {
+      const { PDFParse } = pdfParseLib;
+      const axios = (await import('axios')).default;
+      await Promise.all(documents.map(async (doc: any) => {
+        let pdfText = 'pdf not found';
+        try {
+          const filesRes = await axios.get(`https://api.mendeley.com/files?document_id=${doc.id}`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          
+          const files = filesRes.data || [];
+          const pdfFile = files.find((f: any) => 
+            f.mime_type === 'application/pdf' || (f.file_name || '').toLowerCase().endsWith('.pdf')
+          );
+          
+          if (pdfFile) {
+            const fileId = pdfFile.id;
+            const fileContentRes = await axios.get(`https://api.mendeley.com/files/${fileId}`, {
+              headers: { Authorization: `Bearer ${token}`, Accept: 'application/pdf' },
+              responseType: 'arraybuffer'
+            });
+            
+            // Konversi explicitly ke Buffer
+            const buffer = Buffer.isBuffer(fileContentRes.data) ? fileContentRes.data : Buffer.from(fileContentRes.data);
+            
+            // Gunakan API pdf-parse v2
+            const parser = new PDFParse({ data: buffer });
+            const pdfData = await parser.getText({ first: 3 });
+            await parser.destroy(); // Kosongkan memori
+            
+            // Hapus multiple whitespace agar lebih efisien
+            const cleanText = (pdfData.text || '').replace(/\s+/g, ' ').trim();
+            pdfText = cleanText.substring(0, 4000); 
+          }
+        } catch (e: any) {
+          console.error(`[AI PDF Extract] Failed for doc ${doc.id}:`, e.message);
+        }
+        doc.pdf_text = pdfText || 'pdf not found';
+      }));
+    } else {
+      documents.forEach((doc: any) => doc.pdf_text = 'pdf not found');
+    }
 
     const prompt = `${systemInstruction}
 
@@ -225,7 +284,11 @@ ${JSON.stringify(documents, null, 2)}`;
         if (!Array.isArray(parsed)) parsed = [parsed];
         results = parsed;
       } catch (e: any) {
-        throw new Error('Local Bridge error: ' + e.message);
+        let msg = e.message;
+        if (e.response && e.response.data) {
+          msg = typeof e.response.data === 'string' ? e.response.data : JSON.stringify(e.response.data);
+        }
+        throw new Error('Local Bridge error: ' + msg);
       }
     } else {
       results = await withRetry({ userId: req.userId!, provider }, async (apiKey) => {

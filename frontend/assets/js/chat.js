@@ -228,7 +228,7 @@ window.initChat = () => {
 
           let taskRes = '';
           try {
-            await ApiClient.chat.sendMessageStream(currentSessionId, taskPrompt, docContext, selContext, true, 'assistant', (chunk) => {
+            await ApiClient.chat.sendMessageStream(currentSessionId, taskPrompt, docContext, selContext, true, 'default', (chunk) => {
               if (typeof chunk === 'string') {
                 taskRes += chunk;
               }
@@ -250,8 +250,8 @@ window.initChat = () => {
             if (parsed && parsed.tool && parsed.tool !== 'none' && parsed.operations && parsed.operations.length > 0) {
               const ops = parsed.operations;
               ops.forEach(op => {
-                if (!op.find && (op.text_selection || op.location || op.target || op.text)) {
-                  op.find = op.text_selection || op.location || op.target || op.text;
+                if (!op.find && (op.text_selection || op.target || op.text)) {
+                  op.find = op.text_selection || op.target || op.text;
                 }
               });
 
@@ -263,6 +263,29 @@ window.initChat = () => {
               else if (parsed.tool === 'delete') await OfficeBridge.deleteSelection(ops);
               else if (parsed.tool === 'comment') await OfficeBridge.addCommentSelection(ops);
               else if (parsed.tool === 'highlight') await OfficeBridge.highlightSelection(ops);
+              else if (parsed.tool === 'manage_skill') {
+                const op = ops[0];
+                if (op.action === 'delete') {
+                  if (op.id) await ApiClient.skills.remove(op.id);
+                } else if (op.action === 'update') {
+                  if (op.id) {
+                    await ApiClient.skills.update(op.id, {
+                        name: op.name,
+                        description: op.description || 'Dibuat otomatis oleh AI',
+                        prompt_injection: op.prompt_injection,
+                        is_active: true
+                    });
+                  }
+                } else {
+                  await ApiClient.skills.add({
+                      name: op.name,
+                      description: op.description || 'Dibuat otomatis oleh AI',
+                      prompt_injection: op.prompt_injection,
+                      is_active: true
+                  });
+                }
+                if (window.SkillsManager) window.SkillsManager.loadSkills();
+              }
               else if (parsed.tool === 'view_code') {
                 const pathToView = ops[0].path;
                 const res = await fetch('http://localhost:3001/system/view-code', {
@@ -1047,7 +1070,7 @@ window.initChat = () => {
       }
       // Immediately stop live stream if active
       if (els.ctxLive && els.ctxLive.checked) {
-        OfficeBridge.stopLiveStream().catch(console.warn);
+        OfficeBridge.forceStop(); // Panggil forceStop untuk hentikan loop tool di OfficeBridge
       }
       // Disable button to prevent double click during abort
       els.btnSend.disabled = true;
@@ -1070,21 +1093,33 @@ window.initChat = () => {
 
     isGenerating = true;
 
+    // Deklarasikan di luar try{} agar bisa diakses di finally{}
+    let hasStartedWordStream = false;
+    let fullResponse = '';
+    let lastMessageLength = 0;
+    let finalStreamText = '';
+
     // Change Send Button to Stop Button immediately
     els.btnSend.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="6" width="12" height="12"></rect></svg>';
     els.btnSend.classList.add('text-danger');
 
     abortController = new AbortController();
+    OfficeBridge.resetForceStop(); // Reset force stop state sebelum mulai request baru
 
     let docContext = '';
     let selContext = '';
 
     if (els.ctxFull.checked) {
       docContext = await OfficeBridge.getAllText();
-      try {
-        const styles = await OfficeBridge.getAllStyles();
-        if (styles && styles.length) docContext += "\n\n[AVAILABLE STYLES]\n" + styles.join(", ");
-      } catch (e) { }
+      
+      if (!docContext || docContext.trim() === '') {
+        showToast('⚠️ Gagal mengekstrak dokumen. Dokumen kosong atau terlalu berat.', 'error');
+      } else {
+        try {
+          const styles = await OfficeBridge.getAllStyles();
+          if (styles && styles.length) docContext += "\n\n[AVAILABLE STYLES]\n" + styles.join(", ");
+        } catch (e) { }
+      }
     }
 
     if (attachedDocs.length > 0) {
@@ -1147,10 +1182,6 @@ window.initChat = () => {
     scrollToBottom();
 
     try {
-      let fullResponse = '';
-      let hasStartedWordStream = false;
-      let lastMessageLength = 0;
-
       const isLiveEdit = els.ctxLive && els.ctxLive.checked;
       let finalContent = text;
       if (text.startsWith('/sitasi ')) {
@@ -1171,7 +1202,7 @@ window.initChat = () => {
         finalContent = "Tolong buatkan kerangka tulisan (outline) yang terstruktur untuk topik berikut: " + text.substring(9);
       }
 
-      const persona = els.personaSelect ? els.personaSelect.value : 'assistant';
+      const persona = els.personaSelect ? els.personaSelect.value : 'default';
 
       // Guidance to reduce Word delete/replace failures (e.g., 0xA7210002)
       // If user asks for bulk removal, steer the model to use delete + short anchors.
@@ -1194,6 +1225,9 @@ window.initChat = () => {
           ? (finalContent + deleteSafetyPrompt)
           : finalContent;
 
+      let finalMessageStr = '';
+      let finalThoughtStr = '';
+
       await ApiClient.chat.sendMessageStream(currentSessionId, safeFinalContent, docContext, selContext, isLiveEdit, persona, (chunk) => {
         if (typeof chunk === 'object' && chunk.type === 'title_updated') {
           els.title.textContent = chunk.title;
@@ -1215,23 +1249,35 @@ window.initChat = () => {
           let isEscaped = false;
           for (let i = quoteIndex + 1; i < fullStr.length; i++) {
             const char = fullStr[i];
+            extracted += char;
             if (isEscaped) {
-              extracted += '\\' + char;
               isEscaped = false;
             } else if (char === '\\') {
               isEscaped = true;
             } else if (char === '"') {
-              break;
-            } else {
-              extracted += char;
+              // Check if it's an unescaped quote inside the string
+              const nextChars = fullStr.substring(i + 1).trim();
+              if (nextChars.length === 0 || nextChars.startsWith(',') || nextChars.startsWith('}')) {
+                extracted = extracted.slice(0, -1);
+                break;
+              }
             }
           }
-          return extracted.replace(/\\n/g, '\n').replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+          if (isEscaped) extracted = extracted.slice(0, -1);
+          try {
+            return JSON.parse('"' + extracted + '"');
+          } catch(e) {
+            return extracted.replace(/\\n/g, '\n').replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+          }
         };
 
         const extractedMessage = extractStreamingString(fullResponse, 'message');
         const extractedThought = extractStreamingString(fullResponse, 'thought');
         const extractedStreamText = extractStreamingString(fullResponse, 'stream_to_word');
+        
+        finalMessageStr = extractedMessage;
+        finalThoughtStr = extractedThought;
+        finalStreamText = extractedStreamText;
 
         // Extract tool
         const toolMatch = fullResponse.match(/"tool"\s*:\s*"([^"]+)"/);
@@ -1273,6 +1319,13 @@ window.initChat = () => {
         scrollToBottom();
       }, abortController.signal);
 
+      // Jika live stream ke Word sedang berjalan, hentikan dan tunggu sampai benar-benar selesai
+      // SEBELUM parsing JSON dan eksekusi tool apapun — ini mencegah konflik tumpang tindih.
+      if (hasStartedWordStream && els.ctxLive && els.ctxLive.checked) {
+        await OfficeBridge.stopLiveStream();
+        hasStartedWordStream = false;
+      }
+
       // Stream completed. Parse full JSON and execute tools.
       let parsed = null;
       let parseError = "";
@@ -1284,11 +1337,7 @@ window.initChat = () => {
 
         function sanitizeJsonString(str) {
           // Escape semua backslash yang tidak diikuti oleh karakter escape yang valid
-          return str.replace(/\\(?!["\\/bfnrtu])/g, '\\\\')
-            .replace(/\n/g, '\\n')
-            .replace(/\r/g, '\\r')
-            .replace(/\t/g, '\\t')
-            .replace(/[\u0000-\u001F]/g, (c) => '\\u' + ('0000' + c.charCodeAt(0).toString(16)).slice(-4));
+          return str.replace(/\\(?!["\\/bfnrtu])/g, '\\\\');
         }
 
         jsonToParse = sanitizeJsonString(jsonToParse);
@@ -1329,14 +1378,69 @@ window.initChat = () => {
           || tryParse(jsonToParse + '"}');
 
         if (!parsed) {
-          console.warn("Failed to parse final JSON entirely. Using regex fallback.");
-          const msgMatch = fullResponse.match(/"message"\s*:\s*"((?:[^"\\]|\\.)*)"/);
-          const thoughtMatch = fullResponse.match(/"thought"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+          console.warn("Failed to parse final JSON entirely. Using streaming fallback.");
+          
+          let toolFallback = "none";
+          let opsFallback = [];
+          
+          const toolMatch = fullResponse.match(/"tool"\s*:\s*"([^"]+)"/);
+          if (toolMatch) toolFallback = toolMatch[1];
+          
+          const opsMatch = fullResponse.match(/"operations"\s*:\s*(\[[\s\S]*\])/);
+          if (opsMatch) {
+             try {
+                opsFallback = JSON.parse(opsMatch[1].trim());
+             } catch(e) {
+                try {
+                   function repairJSONStrings(str) {
+                     let res = '';
+                     let inString = false;
+                     for(let i=0; i<str.length; i++) {
+                       let c = str[i];
+                       if (c === '"') {
+                         if (i > 0 && str[i-1] === '\\') {
+                           res += c;
+                         } else {
+                           let prev = str.slice(0, i).trim().slice(-1);
+                           let next = str.slice(i+1).trim()[0];
+                           let isStructural = false;
+                           if (!inString) {
+                             if (['{','[',':',','].includes(prev) || prev === '') isStructural = true;
+                           } else {
+                             if (['}',']',':',','].includes(next) || next === undefined) isStructural = true;
+                           }
+                           
+                           if (isStructural) {
+                             inString = !inString;
+                             res += '"';
+                           } else {
+                             res += '\\"'; // Escape the unescaped quote
+                           }
+                         }
+                       } else {
+                         // escape literal newlines
+                         if (inString && c === '\n') res += '\\n';
+                         else if (inString && c === '\r') res += '';
+                         else if (inString && c === '\t') res += '\\t';
+                         else res += c;
+                       }
+                     }
+                     return res;
+                   }
+                   
+                   let repairedOps = repairJSONStrings(opsMatch[1].trim());
+                   opsFallback = JSON.parse(repairedOps);
+                } catch(e2) {
+                   console.warn("Could not salvage operations array with repair tool:", e2);
+                }
+             }
+          }
+
           parsed = {
-            message: msgMatch ? msgMatch[1].replace(/\\n/g, '\n').replace(/\\"/g, '"') : fullResponse,
-            thought: thoughtMatch ? thoughtMatch[1].replace(/\\n/g, '\n').replace(/\\"/g, '"') : '',
-            tool: "none",
-            operations: []
+            message: finalMessageStr || fullResponse,
+            thought: finalThoughtStr || '',
+            tool: toolFallback,
+            operations: opsFallback
           };
         }
       } catch (e) {
@@ -1349,10 +1453,14 @@ window.initChat = () => {
           finalHtml += '<details class="ai-thought"><summary>🧠 Pemikiran AI (Selesai)</summary><div class="thought-content">' + parsed.thought.replace(/\n/g, '<br/>') + '</div></details>';
         }
 
-        finalHtml += (parsed.message || '')
-          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-          .replace(/\*(.*?)\*/g, '<em>$1</em>')
-          .replace(/\n/g, '<br/>');
+        if (window.marked && parsed.message) {
+          finalHtml += window.marked.parse(parsed.message);
+        } else {
+          finalHtml += (parsed.message || '')
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.*?)\*/g, '<em>$1</em>')
+            .replace(/\n/g, '<br/>');
+        }
 
         const tool = parsed.tool;
         const ops = parsed.operations || [];
@@ -1363,20 +1471,26 @@ window.initChat = () => {
           // Handle AI hallucinating 'find' key
           if (Array.isArray(ops)) {
             ops.forEach(op => {
-              if (!op.find && (op.text_selection || op.location || op.target || op.text)) {
-                op.find = op.text_selection || op.location || op.target || op.text;
+              if (!op.find && (op.text_selection || op.target || op.text)) {
+                op.find = op.text_selection || op.target || op.text;
               }
             });
           }
 
           try {
             if (els.ctxLive && els.ctxLive.checked) {
-              let executedCount = { replace: 0, comment: 0, highlight: 0, insert: 0, format: 0, delete: 0, table: 0, table_edit: 0, view_code: 0 };
+              let executedCount = { replace: 0, comment: 0, highlight: 0, insert: 0, format: 0, delete: 0, table: 0, table_edit: 0, view_code: 0, manage_skill: 0 };
 
               let actionIdsForUndo = [];
               
-              for (const op of ops) {
-                let act = tool === 'table' ? 'table' : tool === 'table_edit' ? 'table_edit' : (op.action || tool);
+              for (let opIndex = 0; opIndex < ops.length; opIndex++) {
+                if (OfficeBridge.getForceStopped()) {
+                  console.warn("Eksekusi tool dihentikan secara paksa oleh pengguna.");
+                  break;
+                }
+
+                const op = ops[opIndex];
+                let act = tool === 'table' ? 'table' : tool === 'table_edit' ? 'table_edit' : tool === 'manage_skill' ? 'manage_skill' : tool === 'view_code' ? 'view_code' : (op.action || tool);
 
                 // Buat actionId untuk operasi yang didukung undo
                 if (['replace', 'insert'].includes(act)) {
@@ -1392,6 +1506,29 @@ window.initChat = () => {
                 else if (act === 'delete') { await OfficeBridge.deleteSelection([op]); executedCount.delete++; }
                 else if (act === 'table') { await OfficeBridge.insertTableSelection(op); executedCount.table++; }
                 else if (act === 'table_edit') { await OfficeBridge.editTableSelection([op]); executedCount.table_edit++; }
+                else if (act === 'manage_skill') {
+                  if (op.action === 'delete') {
+                    if (op.id) await ApiClient.skills.remove(op.id);
+                  } else if (op.action === 'update') {
+                    if (op.id) {
+                      await ApiClient.skills.update(op.id, {
+                          name: op.name,
+                          description: op.description || 'Dibuat otomatis oleh AI',
+                          prompt_injection: op.prompt_injection,
+                          is_active: true
+                      });
+                    }
+                  } else {
+                    await ApiClient.skills.add({
+                        name: op.name,
+                        description: op.description || 'Dibuat otomatis oleh AI',
+                        prompt_injection: op.prompt_injection,
+                        is_active: true
+                    });
+                  }
+                  if (window.SkillsManager) window.SkillsManager.loadSkills();
+                  executedCount.manage_skill++;
+                }
                 else if (act === 'view_code') {
                   if (hasExecutedViewCode) continue;
                   hasExecutedViewCode = true;
@@ -1441,6 +1578,11 @@ window.initChat = () => {
                     toolMsg += `❌ Error view_code: ${e.message}. `;
                   }
                 }
+                
+                // Beri jeda 1.2 detik antar eksekusi jika operasi lebih dari satu, agar terlihat natural
+                if (ops.length > 1 && opIndex < ops.length - 1) {
+                  await new Promise(r => setTimeout(r, 1200));
+                }
               }
 
               // Susun pesan status berdasarkan rekap
@@ -1452,6 +1594,7 @@ window.initChat = () => {
               if (executedCount.delete) toolMsg += '🗑️ Berhasil menghapus teks. ';
               if (executedCount.table) toolMsg += '📊 Berhasil membuat tabel. ';
               if (executedCount.table_edit) toolMsg += '📝 Berhasil memodifikasi tabel. ';
+              if (executedCount.manage_skill) toolMsg += '🧠 Berhasil membuat rule/skill permanen. ';
 
               // Tambahkan tombol Undo jika ada operasi yang mendukung
               if (actionIdsForUndo.length > 0) {
@@ -1527,7 +1670,7 @@ window.initChat = () => {
         if (els.ctxLive && els.ctxLive.checked && hasStartedWordStream) {
           await OfficeBridge.stopLiveStream();
           const actionId = OfficeBridge.generateId();
-          OfficeBridge.addUndoRecord(actionId, 'insert', { inserted_text: extractedStreamText });
+          OfficeBridge.addUndoRecord(actionId, 'insert', { inserted_text: finalStreamText });
           
           finalHtml += `<div style="color:var(--accent);font-size:11px;padding:5px 8px;background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.25);border-radius:4px;margin-top:8px;display:flex;align-items:center;justify-content:space-between;gap:6px;">
             <span>✍️ Teks berhasil ditulis ke dokumen Word.</span>

@@ -9,12 +9,22 @@ export interface AuthRequest extends Request {
 
 export function authMiddleware(req: AuthRequest, _res: Response, next: NextFunction): void {
   try {
+    // Support token via Authorization header ATAU query param (untuk iframe src)
     const authHeader = req.headers.authorization;
-    if (!authHeader?.startsWith('Bearer ')) {
+    const queryToken = req.query?.token as string | undefined;
+
+    let token: string | undefined;
+
+    if (authHeader?.startsWith('Bearer ')) {
+      token = authHeader.split(' ')[1];
+    } else if (queryToken) {
+      token = queryToken;
+    }
+
+    if (!token) {
       return next(createError('No token provided', 401, 'UNAUTHORIZED'));
     }
 
-    const token = authHeader.split(' ')[1];
     const secret = process.env.JWT_SECRET || 'dev-secret';
     const decoded = jwt.verify(token, secret) as { userId: string };
 

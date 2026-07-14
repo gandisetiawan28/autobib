@@ -6,6 +6,22 @@ import { createError } from '../middleware/error.middleware';
 import { logger } from '../utils/logger';
 import type { Provider } from '../services/key-pool.service';
 import { defaultRegistry } from '../utils/tool-registry';
+import { z } from 'zod';
+
+// ── Zod Schemas ──────────────────────────────────────────────
+const SendMessageSchema = z.object({
+  content: z.string().min(1, 'Pesan tidak boleh kosong').max(50000),
+  documentContext: z.string().max(2000000).optional(),
+  selectionContext: z.string().max(10000).optional(),
+  persona: z.enum(['default', 'reviewer', 'proofreader']).optional().default('default'),
+});
+
+const AgentPhaseSchema = z.object({
+  phase: z.number().int().min(1).max(3),
+  content: z.string().min(1).max(50000),
+  documentContext: z.string().max(2000000).optional(),
+  selectionContext: z.string().max(10000).optional(),
+});
 
 const router = Router();
 router.use(authMiddleware);
@@ -65,8 +81,11 @@ router.get('/sessions/:id/messages', (req: AuthRequest, res: Response, next: Nex
 // ── POST /chat/agent-phase ────────────────────────────────────
 router.post('/agent-phase', async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
-    const { phase, content, documentContext, selectionContext } = req.body;
-    if (!phase || !content) return next(createError('Phase and content are required', 400));
+    const validation = AgentPhaseSchema.safeParse(req.body);
+    if (!validation.success) {
+      return next(createError('Invalid request: ' + validation.error.errors[0]?.message, 400));
+    }
+    const { phase, content, documentContext, selectionContext } = validation.data;
     
     let systemPrompt = '';
     
@@ -81,7 +100,9 @@ router.post('/agent-phase', async (req: AuthRequest, res: Response, next: NextFu
     }
     
     if (documentContext) {
-      systemPrompt += `\n\n[DOCUMENT CONTEXT]\n${documentContext.substring(0, 15000)}`;
+      systemPrompt += `\n\n[DOCUMENT CONTEXT]\n${documentContext}`;
+    } else {
+      systemPrompt += `\n\n[DOCUMENT CONTEXT]\n(Teks dokumen kosong. Sistem tidak menerima konteks. Ingatkan pengguna mengaktifkan toggle 'Konteks Penuh')`;
     }
     if (selectionContext) {
       systemPrompt += `\n\n[SELECTED TEXT]\n${selectionContext}`;
@@ -93,6 +114,22 @@ router.post('/agent-phase', async (req: AuthRequest, res: Response, next: NextFu
       
       // Extra explicit warning for planner
       systemPrompt += `\nCRITICAL STRATEGY RULE: Do NOT instruct the execution agent to target Headings or Titles (like "BAB I", "1. 1. Latar Belakang") because the MS Word API will accidentally find them in the Table of Contents first! ALWAYS instruct the agent to target a unique sentence from the BODY paragraph instead! IF AND ONLY IF the section is completely empty (no body text below the heading), you MAY instruct the agent to target the Heading, but you MUST explicitly tell the agent to use '"match_index": 2' in their operation to skip the Table of Contents.`;
+      
+      // Smart JSON formatting rule
+      systemPrompt += `\nCRITICAL JSON RULE: When returning JSON, you MUST properly escape ALL double quotes inside string values (e.g., use \\" instead of "). NEVER put literal unescaped double quotes inside the "message" or "thought" fields. NEVER output literal newline characters inside string values; always use \\n. If you replace a whole paragraph, make sure your replacement text ends with \\n to maintain the paragraph break.`;
+
+      // Markdown support rule
+      systemPrompt += `\nCRITICAL FORMATTING RULE: You CAN and SHOULD use markdown inside your 'insert', 'replace', and 'stream_to_word' text values if the user requests formatting like bold, italic, superscript, or subscript. Supported syntax: **bold**, *italic*, _italic_, ^superscript^, and ~subscript~. Examples: "H~2~O", "x^2^", "**Important text**".`;
+      systemPrompt += `\nNOTE: [DOCUMENT CONTEXT] is provided as plain text without inline markdown. Do NOT include markdown symbols (like **, _) in your 'find' string. Search only for the plain text!`;
+    }
+
+    const activeSkills = getDb().prepare('SELECT id, name, prompt_injection FROM ai_skills WHERE user_id = ? AND is_active = 1').all(req.userId) as any[];
+    if (activeSkills.length > 0) {
+      systemPrompt += `\n\n=== USER ACTIVE SKILLS & CUSTOM RULES ===\nThe user has defined the following custom skills/rules that you MUST strictly obey during this task:\n`;
+      activeSkills.forEach((s, idx) => {
+        systemPrompt += `\n[Skill ${idx+1} | ID: ${s.id} | Name: ${s.name}]\n${s.prompt_injection}\n`;
+      });
+      systemPrompt += `=========================================\n`;
     }
 
     const messages = [
@@ -134,7 +171,11 @@ router.post('/agent-phase', async (req: AuthRequest, res: Response, next: NextFu
         if (text) sendEvent({ chunk: text });
       } catch (e: any) {
         if (e.code === 'ECONNREFUSED') throw new Error('Local Bridge tidak berjalan (port 3000)');
-        throw new Error('Local Bridge error: ' + e.message);
+        let msg = e.message;
+        if (e.response && e.response.data) {
+          msg = typeof e.response.data === 'string' ? e.response.data : JSON.stringify(e.response.data);
+        }
+        throw new Error('Local Bridge error: ' + msg);
       }
     } else {
       await withRetry(
@@ -181,8 +222,11 @@ router.post('/agent-phase', async (req: AuthRequest, res: Response, next: NextFu
 // ── POST /chat/sessions/:id/message (Streaming) ───────────────
 router.post('/sessions/:id/message', async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
-    const { content, documentContext, selectionContext, persona } = req.body;
-    if (!content) return next(createError('Message content is required', 400));
+    const validation = SendMessageSchema.safeParse(req.body);
+    if (!validation.success) {
+      return next(createError('Invalid request: ' + validation.error.errors[0]?.message, 400));
+    }
+    const { content, documentContext, selectionContext, persona } = validation.data;
     
     const db = getDb();
     
@@ -203,10 +247,14 @@ router.post('/sessions/:id/message', async (req: AuthRequest, res: Response, nex
     }
 
     // Build System Prompt with Context
-    let systemPrompt = `${personaInstruction}
-CRITICAL INSTRUCTION: You MUST ALWAYS respond with a SINGLE valid JSON object. DO NOT output any raw text, markdown blocks, or conversational prose outside of the JSON object.
+    // Build System Prompt with Context
+    let systemPrompt = `<role>\n${personaInstruction}\n</role>
 
-Your JSON MUST strictly follow this structure:
+<critical_instruction>
+You MUST ALWAYS respond with a SINGLE valid JSON object. DO NOT output any raw text, markdown blocks, or conversational prose outside of the JSON object.
+</critical_instruction>
+
+<json_format>
 {
   "thought": "Your internal reasoning process. Plan your actions here step-by-step.",
   "message": "Your conversational reply to the user. Use '\\n' for newlines.",
@@ -216,7 +264,7 @@ Your JSON MUST strictly follow this structure:
      // Tool-specific JSON objects go here. Leave empty array if tool is 'none' or not needed.
   ],
   "stream_to_word": "ONLY use this field if you are generating BRAND NEW text to be inserted/typed directly into the document. Otherwise, leave it empty.",
-  "needs_followup": true/false // CRITICAL: Set to FALSE in 99% of cases! ONLY set to TRUE if you are using 'view_code' OR if you EXPLICITLY want the system to automatically trigger you again without waiting for the user. If your task is done, MUST be FALSE.
+  "needs_followup": true/false // CRITICAL: ALWAYS set this to TRUE after you perform ANY document modification (insert, replace, table, etc) so that you can verify the results of your work in the next turn! ONLY set to FALSE if you have just verified the results and everything is correct, or if you are just answering a question without making changes.
 }
 
 Example 1 - Using tools:
@@ -227,61 +275,50 @@ Example 1 - Using tools:
   "message": "Saya akan menambahkan komentar pada teks tersebut. Sistem sedang memprosesnya...",
   "stream_to_word": ""
 }
-
-Example 2 - Generating new text into the document:
-{
-  "tool": "none",
-  "operations": [],
-  "thought": "The user is asking for a new paragraph.",
-  "message": "Berikut adalah paragraf yang Anda minta:",
-  "stream_to_word": "Manajemen Sumber Daya Manusia adalah..."
-}
-\n`;
+</json_format>
+`;
     if (documentContext) {
-      systemPrompt += `\n[DOCUMENT CONTENT]\n${documentContext}\n[/DOCUMENT CONTENT]\n`;
+      systemPrompt += `\n<document_content>\n${documentContext}\n</document_content>\n`;
+    } else {
+      systemPrompt += `\n<document_content>\n(Teks dokumen kosong. Sistem tidak menerima konteks dokumen dari Add-in. Harap ingatkan pengguna untuk mengaktifkan toggle 'Konteks Penuh' jika mereka bertanya tentang isi dokumen)\n</document_content>\n`;
     }
     if (selectionContext) {
-      systemPrompt += `\n[SELECTED TEXT]\n${selectionContext}\n[/SELECTED TEXT]\n`;
+      systemPrompt += `\n<selected_text>\n${selectionContext}\n</selected_text>\n`;
     }
     
     if (documentContext || selectionContext) {
-      systemPrompt += defaultRegistry.getToolsInstruction();
+      systemPrompt += `\n<tool_instructions>\n${defaultRegistry.getToolsInstruction()}\n</tool_instructions>\n`;
     }
-    
-    systemPrompt += `\nRemember, you MUST output ONLY valid JSON. No markdown blocks outside the JSON!\nCRITICAL: ALWAYS verify that the text you are targeting in 'find', 'before', or 'after' actually exists exactly as plain text in the current [DOCUMENT CONTENT]. DO NOT rely on chat history.
-IMPORTANT RULE FOR TABLES: The [DOCUMENT CONTENT] extracts tables using Markdown format (e.g. '| No | Nama |'). DO NOT use these markdown-formatted table strings as search targets or anchors in your tools! MS Word does not store them as text with pipes. If you need to insert something near a table, use 'location: end', target a plain paragraph outside the table, or use the 'table_edit' tool instead.
-FORBIDDEN - MANUAL DELETION: NEVER suggest or advise the user to manually delete text. If the user asks you to delete something, you MUST ALWAYS use the 'delete' tool in your JSON response with a proper 'find' anchor. ALWAYS perform deletions automatically using the tool - do NOT tell the user to manually delete anything.
-CUSTOM INSTRUCTION FOR HEADING NUMBERING:
-JANGAN pernah menggunakan penomoran manual (seperti '1.', '2.', '1.1.', '2.1.1.') pada heading atau judul di dalam dokumen Word.
 
-**Alasan:**
-- Format style Word (seperti Heading 1, Heading 2) sudah memiliki fitur penomoran otomatis (multilevel list).
-- Jika Anda menambahkan nomor secara manual, hasilnya akan menjadi duplikat atau formatnya menjadi rusak (contoh: "2. 1. 1. 2. 1. 1. Konsep Harga").
+    systemPrompt += `
+<formatting_rules>
+- You CAN and SHOULD use markdown inside your 'insert', 'replace', and 'stream_to_word' text values if the user requests formatting like bold, italic, superscript, or subscript. 
+- Supported syntax: **bold**, *italic*, _italic_, ^superscript^, and ~subscript~. Examples: "H~2~O", "x^2^", "**Important text**".
+- Paragraph Marks: The document text explicitly shows paragraph breaks as '^p' and soft line breaks as '^l'. You can target these marks in your 'find', 'after', or 'before' fields (e.g., to delete a blank line, target "^p"). You can ALSO output '^p' and '^l' in your 'replace', 'insert', or 'stream_to_word' text to force Word to create paragraph breaks or soft line breaks precisely!
+</formatting_rules>
 
-**Cara yang benar:**
-Gunakan style heading yang disediakan oleh Word (Heading 1, Heading 2, dst.) dan biarkan Word yang menangani penomorannya secara otomatis.
+<targeting_and_anchoring_rules>
+- EXACT MATCH: ALWAYS verify that the text you are targeting in 'find', 'before', or 'after' actually exists exactly as plain text in the current <document_content>. DO NOT rely on chat history. 
+- NO MARKDOWN IN SEARCH: <document_content> is provided as plain text without inline markdown. Do NOT include markdown symbols (like **, _) in your 'find' string. Search only for the plain text!
+- SEQUENTIAL INSERTIONS: When you need to insert multiple items (e.g., headings, paragraphs) sequentially, you MUST use the newly inserted text as the anchor for the next insertion. DO NOT reuse the same anchor text for multiple insertions, because the system will always find the first occurrence and insert there, causing all items to cluster. Instead, after inserting the first item, use that item's exact text as the 'after' target for the next insertion. This ensures proper hierarchical ordering.
+</targeting_and_anchoring_rules>
 
-CRITICAL RULE FOR SEQUENTIAL INSERTIONS:
-When you need to insert multiple items (e.g., headings, paragraphs) sequentially, you MUST use the newly inserted text as the anchor for the next insertion.
-DO NOT reuse the same anchor text (e.g., "Konsep Harga") for multiple insertions, because the system will always find the first occurrence and insert there, causing all items to cluster.
-Instead, after inserting the first item, use that item's exact text as the 'after' target for the next insertion.
-Example: Insert "Konsep Harga" after "Landasan Teori". Then insert "Indikator Harga" after "Konsep Harga". Then insert "Konsep Lokasi" after "Indikator Harga", and so on.
-This ensures proper hierarchical ordering.
+<special_instructions>
+- TABLES: The <document_content> extracts tables using Markdown format (e.g. '| No | Nama |'). DO NOT use these markdown-formatted table strings as search targets or anchors in your tools! MS Word does not store them as text with pipes. If you need to insert something near a table, use 'location: end', target a plain paragraph outside the table, or use the 'table_edit' tool instead.
+- MANUAL DELETION FORBIDDEN: NEVER suggest or advise the user to manually delete text. If the user asks you to delete something, you MUST ALWAYS use the 'delete' tool in your JSON response with a proper 'find' anchor.
+- DELETE TOOL SPECIFICITY: When deleting, you must be specific to avoid deleting unintended content (like Table of Contents or Titles). For headings, always use '"target_style": "Heading 1;Judul;BAB"'. For paragraphs, use '"target_type": "paragraph"' and provide 5-7 unique words. Avoid generic words.
+- HEADING NUMBERING: JANGAN pernah menggunakan penomoran manual (seperti '1.', '2.', '1.1.', '2.1.1.') pada heading atau judul di dalam dokumen Word. Gunakan style heading (Heading 1, Heading 2, dst.) dan biarkan Word yang menangani penomorannya secara otomatis untuk mencegah duplikasi (misal: "2. 1. 1. 2. 1. 1. Konsep Harga").
+- PROMPT SUGGESTIONS: Always analyze the user's prompt. If their request is ambiguous, relies on bad anchors, or could be executed more effectively (e.g. they should have used 'multi' tool, or specified a target style), proactively give them "Saran Prompt" in your 'message' to teach them how to command you better next time.
+</special_instructions>`;
 
-PROMPT ANALYSIS & SUGGESTIONS: Always analyze the user's prompt. If the user's request is ambiguous, relies on bad anchors, or could be executed more effectively (e.g. they should have used 'multi' tool, or specified a target style), proactively give them "Saran Prompt" in your 'message' to teach them how to command you better next time.
-
-CUSTOM INSTRUCTION FOR DELETE OPERATIONS:
-Masalah judul ikut terhapus bukan disebabkan oleh sistem atau prompting, melainkan **cara Anda menggunakan fitur delete** yang kurang spesifik.
-
-Sistem sudah menyediakan parameter seperti 'target_style' dan 'target_type' untuk membatasi pencarian hanya pada area tertentu. Jika Anda tidak menggunakannya, sistem akan mencari teks di seluruh dokumen dan menghapus semua kemunculan, termasuk di daftar isi dan halaman judul.
-
-Jadi, yang perlu diperbaiki adalah **cara Anda memberikan instruksi delete**, bukan sistem atau prompt secara keseluruhan. Berikut saran perbaikan:
-
-- Saat menghapus heading, selalu sertakan '"target_style": "Heading 1;Judul;BAB"' atau style yang sesuai.
-- Untuk paragraf biasa, gunakan '"target_type": "paragraph"' dan masukkan 5-7 kata pertama yang unik dari paragraf tersebut.
-- Hindari menggunakan kata yang muncul di banyak tempat (seperti 'PENGARUH', 'KATA PENGANTAR') tanpa pembatasan style.
-
-Dengan cara ini, Anda dapat menghapus konten yang diinginkan tanpa merusak bagian lain. Jika Anda masih bingung, beri tahu saya teks spesifik yang ingin dihapus, dan saya akan buatkan operasi delete yang tepat untuk Anda.`;
+    const activeSkills = db.prepare('SELECT id, name, prompt_injection FROM ai_skills WHERE user_id = ? AND is_active = 1').all(req.userId) as any[];
+    if (activeSkills.length > 0) {
+      systemPrompt += `\n\n=== USER ACTIVE SKILLS & CUSTOM RULES ===\nThe user has defined the following custom skills/rules that you MUST strictly obey during this task:\n`;
+      activeSkills.forEach((s, idx) => {
+        systemPrompt += `\n[Skill ${idx+1} | ID: ${s.id} | Name: ${s.name}]\n${s.prompt_injection}\n`;
+      });
+      systemPrompt += `=========================================\n`;
+    }
     
     // Get History (last 10 messages) to provide context
     const history = db.prepare(`

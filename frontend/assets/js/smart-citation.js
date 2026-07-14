@@ -114,9 +114,31 @@ window.initSmartCitation = () => {
       if (loadText) loadText.textContent = 'Mencari metadata jurnal (Semantic Scholar/Mendeley)...';
       logProcess(`Mencocokkan ${parsedPayload.length} sitasi ke database jurnal (Mendeley/Semantic Scholar)...`);
       
-      // 2. Metadata Resolver
-      const resolveRes = await ApiClient.smartCitation.resolve(parsedPayload);
-      resolveRes.resolved.forEach((r, i) => citations[i].resolvedData = r);
+      // 2. Metadata Resolver (Batched for live logging)
+      const batchSize = 15;
+      for (let i = 0; i < parsedPayload.length; i += batchSize) {
+        const batch = parsedPayload.slice(i, i + batchSize);
+        const start = i + 1;
+        const end = Math.min(i + batchSize, parsedPayload.length);
+        logProcess(`... Memeriksa sitasi ${start} - ${end} dari ${parsedPayload.length}`);
+        
+        const resolveRes = await ApiClient.smartCitation.resolve(batch);
+        
+        // Log individual results
+        resolveRes.resolved.forEach((r, j) => {
+          citations[i + j].resolvedData = r;
+          const status = r.items && r.items[0] ? r.items[0].status : 'unknown';
+          const source = r.items && r.items[0] ? r.items[0].source : 'unknown';
+          const title = (r.items && r.items[0] && r.items[0].csl_json && r.items[0].csl_json.title) || batch[j].raw_text;
+          const shortTitle = title.length > 40 ? title.substring(0, 40) + '...' : title;
+          
+          let logIcon = '⏳';
+          if (status === 'found') logIcon = '✅';
+          else if (status === 'partial') logIcon = '⚠️';
+          
+          logProcess(`  ${logIcon} ${shortTitle} [${source}]`);
+        });
+      }
       
       // 3. Build OOXML for each
       for (let i = 0; i < citations.length; i++) {

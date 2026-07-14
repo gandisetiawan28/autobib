@@ -6,11 +6,42 @@ import { getDb } from '../utils/database';
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 import type { Provider } from '../services/key-pool.service';
+import { LRUCache } from 'lru-cache';
+import pLimit from 'p-limit';
+import { z } from 'zod';
 
 import * as crypto from 'crypto';
 
-const parseCache = new Map<string, string>();
-const extractCache = new Map<string, string>();
+// ── LRU Cache (max 500 entry, TTL 1 jam) ─────────────────────
+const parseCache = new LRUCache<string, string>({ max: 500, ttl: 1000 * 60 * 60 });
+const extractCache = new LRUCache<string, string>({ max: 500, ttl: 1000 * 60 * 60 });
+const mendeleyDocsCache = new LRUCache<string, any[]>({ max: 500, ttl: 1000 * 60 * 5 }); // 5 mins
+
+// ── Concurrency limiter (max 20 concurrent API calls) ─────────
+const resolveLimit = pLimit(20);
+
+// ── Zod Schemas ───────────────────────────────────────────────
+const ParseBodySchema = z.object({
+  texts: z.array(z.string().min(1)).min(1).max(100),
+});
+
+const ExtractBodySchema = z.object({
+  text: z.string().min(1).max(200000),
+});
+
+const ResolveBodySchema = z.object({
+  parsed: z.array(z.object({
+    raw_text: z.string().optional(),
+    items: z.array(z.object({
+      author: z.string().nullable().optional(),
+      year: z.union([z.string(), z.number()]).nullable().optional(),
+      title: z.string().nullable().optional(),
+      doi: z.string().nullable().optional(),
+      prefix: z.string().nullable().optional(),
+      suffix: z.string().nullable().optional(),
+    })).optional(),
+  })).min(1),
+});
 
 const router = Router();
 router.use(authMiddleware);
@@ -18,7 +49,12 @@ router.use(authMiddleware);
 // ── POST /smart-citation/parse ────────────────────────────────
 router.post('/parse', async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
-    const { texts } = req.body as { texts: string[] };
+    // Validasi input dengan zod
+    const validation = ParseBodySchema.safeParse(req.body);
+    if (!validation.success) {
+      return next({ statusCode: 400, message: 'Invalid request: ' + validation.error.message });
+    }
+    const { texts } = validation.data;
     const db = getDb();
     const settings = db
       .prepare('SELECT active_provider, local_bridge_url FROM user_settings WHERE user_id = ?')
@@ -176,8 +212,11 @@ ${texts.map((t, i) => `[${i}] ${t}`).join('\n')}`;
 // ── POST /smart-citation/extract-full ────────────────────────
 router.post('/extract-full', async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
-    const { text } = req.body;
-    if (!text) return next({ statusCode: 400, message: 'Text required' });
+    const validation = ExtractBodySchema.safeParse(req.body);
+    if (!validation.success) {
+      return next({ statusCode: 400, message: 'Invalid request: ' + validation.error.message });
+    }
+    const { text } = validation.data;
 
     const systemInstruction = `Extract all academic citations from the text AND parse them into structured data.
 Return ONLY a valid JSON array of objects. Each object represents one citation found in the text.
@@ -289,20 +328,42 @@ ${text.substring(0, 150000)}`;
 // ── POST /smart-citation/resolve ──────────────────────────────
 router.post('/resolve', async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
-    const { parsed } = req.body as { parsed: { raw_text?: string; items?: any[] }[] };
+    // Validasi input dengan zod
+    const validation = ResolveBodySchema.safeParse(req.body);
+    if (!validation.success) {
+      return next({ statusCode: 400, message: 'Invalid request body: ' + validation.error.message });
+    }
+    const { parsed } = validation.data as { parsed: { raw_text?: string; items?: any[] }[] };
     const db = getDb();
 
     let mendeleyToken: string | null = null;
+    let mendeleyDocs: any[] = [];
     try {
       const { getMendeleyToken } = await import('./mendeley.route');
       mendeleyToken = await getMendeleyToken(req.userId!);
+      
+      if (mendeleyToken) {
+        if (mendeleyDocsCache.has(req.userId!)) {
+           mendeleyDocs = mendeleyDocsCache.get(req.userId!)!;
+        } else {
+          // Fetch user's personal library ONCE per request instead of for each citation
+          const mRes = await axios.get('https://api.mendeley.com/documents', {
+            headers: { Authorization: `Bearer ${mendeleyToken}` },
+            params: { limit: 500, view: 'bib' },
+            timeout: 8000
+          });
+          mendeleyDocs = mRes.data || [];
+          mendeleyDocsCache.set(req.userId!, mendeleyDocs);
+        }
+      }
     } catch {}
 
+    // Gunakan p-limit untuk batasi concurrent API calls
     const results = await Promise.all(
-      parsed.map(async (group) => {
+      parsed.map((group) => resolveLimit(async () => {
         const items = group.items || [];
         const resolvedItems = await Promise.all(
-          items.map(async (item) => {
+          items.map((item) => resolveLimit(async () => {
             const hash = sha256(JSON.stringify(item));
             const cached = db.prepare('SELECT * FROM citation_cache WHERE raw_text_hash = ?').get(hash) as {
               csl_json: string; mendeley_uuid: string; resolve_source: string; resolve_status: string;
@@ -312,23 +373,15 @@ router.post('/resolve', async (req: AuthRequest, res: Response, next: NextFuncti
             // }
 
             // 1. Try User's Mendeley Library first
-            if (mendeleyToken) {
+            if (mendeleyToken && mendeleyDocs.length > 0) {
               try {
                 const q = item.title ?? (item.author && item.year ? `${item.author} ${item.year}` : '');
                 if (q) {
-                  // Fetch user's personal library instead of global catalog
-                  const mRes = await axios.get('https://api.mendeley.com/documents', {
-                    headers: { Authorization: `Bearer ${mendeleyToken}` },
-                    params: { limit: 500, view: 'bib' },
-                    timeout: 8000
-                  });
-                  
-                  // Local search algorithm
-                  const docs = mRes.data || [];
+                  // Local search algorithm using pre-fetched docs
                   const targetYear = parseInt(String(item.year));
-                  const targetAuthor = (item.author || '').toLowerCase().replace(/et al\.?/g, '').replace(/[^a-z0-9]/g, ' ').trim().split(' ')[0];
+                  const targetAuthor = (item.author || '').toLowerCase().replace(/et al\\.?/g, '').replace(/[^a-z0-9]/g, ' ').trim().split(' ')[0];
                   
-                  let mDoc = docs.find((doc: any) => {
+                  let mDoc = mendeleyDocs.find((doc: any) => {
                     const docYear = parseInt(String(doc.year));
                     if (item.title && doc.title && doc.title.toLowerCase().includes(item.title.toLowerCase())) return true;
                     if (targetYear && docYear === targetYear && targetAuthor) {
@@ -438,10 +491,10 @@ router.post('/resolve', async (req: AuthRequest, res: Response, next: NextFuncti
         `INSERT OR REPLACE INTO citation_cache (id, raw_text, raw_text_hash, csl_json, resolve_source, resolve_status) VALUES (?, ?, ?, ?, 'ai', 'partial')`
       ).run(uuidv4(), group.raw_text ?? item.title ?? '', hash, JSON.stringify(csl));
       return { ...item, csl_json: csl, source: 'ai', status: 'partial' };
-    })
+    }))
   );
   return { raw_text: group.raw_text, items: resolvedItems };
-})
+  }))
 );
 
     res.json({ success: true, resolved: results });
@@ -544,4 +597,55 @@ router.post('/build-field', (_req: AuthRequest, res: Response, next: NextFunctio
   } catch (err) { next(err); }
 });
 
+// ── POST /smart-citation/format-bibliography ──────────────────
+// Ubah array CSL JSON menjadi teks daftar pustaka terformat (APA, IEEE, dll.)
+router.post('/format-bibliography', async (_req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const FormatSchema = z.object({
+      items: z.array(z.record(z.any())).min(1),
+      style: z.string().optional().default('apa'),
+      locale: z.string().optional().default('id-ID'),
+    });
+
+    const validation = FormatSchema.safeParse(_req.body);
+    if (!validation.success) {
+      return next({ statusCode: 400, message: 'Invalid request: ' + validation.error.message });
+    }
+    const { items, style, locale } = validation.data;
+
+    const { formatBibliography } = await import('../utils/citeproc-formatter');
+    const result = formatBibliography(items, locale, style);
+
+    res.json({ success: true, ...result });
+  } catch (err) { next(err); }
+});
+
+// ── POST /smart-citation/extract-pdf ─────────────────────────
+// Ekstrak teks & metadata dari file PDF untuk otomatis temukan citasi
+import express from 'express';
+router.post(
+  '/extract-pdf',
+  express.raw({ type: ['application/pdf', 'application/octet-stream'], limit: '20mb' }),
+  async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+      if (!req.body || !Buffer.isBuffer(req.body)) {
+        return next({ statusCode: 400, message: 'PDF file buffer is required' });
+      }
+
+      const { extractTextFromPdf, inferCslFromPdfInfo } = await import('../utils/pdf-extractor');
+      const extracted = await extractTextFromPdf(req.body);
+      const inferredCsl = inferCslFromPdfInfo(extracted.info);
+
+      res.json({
+        success: true,
+        text: extracted.text,
+        numPages: extracted.numPages,
+        info: extracted.info,
+        inferred_csl: inferredCsl,
+      });
+    } catch (err) { next(err); }
+  }
+);
+
 export default router;
+

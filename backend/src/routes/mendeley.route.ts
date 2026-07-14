@@ -4,6 +4,14 @@ import axios from 'axios';
 import { getDb } from '../utils/database';
 import { decrypt } from '../utils/crypto';
 import { createError } from '../middleware/error.middleware';
+import * as cheerio from 'cheerio';
+import { z } from 'zod';
+
+// ── Zod Schemas ──────────────────────────────────────────────
+const AddLinkBodySchema = z.object({
+  url: z.string().url('URL tidak valid'),
+  target: z.string().optional(),
+});
 
 const router = Router();
 router.use(authMiddleware);
@@ -81,6 +89,67 @@ router.get('/documents/search', async (req: AuthRequest, res: Response, next: Ne
     });
 
     res.json({ success: true, documents: filtered.slice(0, Number(limit)) });
+  } catch (err) { next(err); }
+});
+
+// ── GET /mendeley/documents/:id/pdf-info ─────────────────────
+// Cek apakah dokumen Mendeley punya file PDF terlampir
+router.get('/documents/:id/pdf-info', async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const token = await getMendeleyToken(req.userId!);
+    // Fetch file list dari dokumen ini
+    const filesRes = await axios.get(`https://api.mendeley.com/files`, {
+      headers: { Authorization: `Bearer ${token}` },
+      params: { document_id: req.params.id },
+      timeout: 8000,
+    });
+    const files: any[] = filesRes.data || [];
+    const pdfFile = files.find((f: any) =>
+      f.mime_type === 'application/pdf' || (f.file_name || '').toLowerCase().endsWith('.pdf')
+    );
+    res.json({
+      success: true,
+      has_pdf: !!pdfFile,
+      file: pdfFile ? {
+        id: pdfFile.id,
+        file_name: pdfFile.file_name,
+        size: pdfFile.size,
+        mime_type: pdfFile.mime_type,
+      } : null,
+    });
+  } catch (err) { next(err); }
+});
+
+// ── GET /mendeley/files/:fileId/content ──────────────────────
+// Proxy stream konten PDF dari Mendeley ke client
+router.get('/files/:fileId/content', async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const token = await getMendeleyToken(req.userId!);
+    const { filename } = req.query;
+
+    const pdfRes = await axios.get(`https://api.mendeley.com/files/${req.params.fileId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: 'application/pdf, application/octet-stream',
+      },
+      responseType: 'stream',
+      timeout: 30000,
+    });
+
+    // Set headers untuk PDF viewer dan inline display
+    res.setHeader('Content-Type', String(pdfRes.headers['content-type'] || 'application/pdf'));
+    res.setHeader('Content-Disposition', `inline; filename="${filename || 'document.pdf'}"`);
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Cache-Control', 'private, max-age=3600');
+    if (pdfRes.headers['content-length']) {
+      res.setHeader('Content-Length', String(pdfRes.headers['content-length']));
+    }
+
+    // Pipe stream langsung ke response
+    pdfRes.data.pipe(res);
+    pdfRes.data.on('error', (err: Error) => {
+      if (!res.headersSent) next(err);
+    });
   } catch (err) { next(err); }
 });
 
@@ -240,52 +309,68 @@ router.post('/upload', express.raw({ type: '*/*', limit: '50mb' }), async (req: 
 // ── POST /mendeley/add-link — Add Web Page by URL ─────────────
 router.post('/add-link', async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
+    // Validasi input dengan zod
+    const validation = AddLinkBodySchema.safeParse(req.body);
+    if (!validation.success) {
+      return next(createError(validation.error.errors[0]?.message ?? 'Invalid request', 400));
+    }
+    const { url, target } = validation.data;
+
     const token = await getMendeleyToken(req.userId!);
-    const { url, target } = req.body;
-    
-    if (!url) return next(createError('URL is required', 400));
     
     // Fetch HTML
     let html = '';
     try {
-      const pageRes = await axios.get(url, { headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0 Safari/537.36' }, timeout: 10000 });
-      html = pageRes.data;
+      const pageRes = await axios.get(url, {
+        headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0 Safari/537.36' },
+        timeout: 10000,
+      });
+      html = typeof pageRes.data === 'string' ? pageRes.data : String(pageRes.data);
     } catch (e) {
       console.warn('Could not fetch URL for scraping', e);
-      // We will just create a generic link document
     }
 
-    // Extract metadata via regex
-    const getMatch = (regex: RegExp) => {
-      const match = html.match(regex);
-      return match ? match[1].trim() : null;
+    // ── Ekstrak metadata menggunakan Cheerio (DOM parser) ────────
+    const $ = cheerio.load(html);
+
+    const getMeta = (selectors: string[]): string | null => {
+      for (const sel of selectors) {
+        const val = $(sel).attr('content')?.trim();
+        if (val) return val;
+      }
+      return null;
     };
-    
-    const title = getMatch(/<meta[^>]*property=["']og:title["'][^>]*content=["']([^"']+)["']/i) 
-               || getMatch(/<title[^>]*>([^<]+)<\/title>/i) 
-               || url;
-               
-    const abstract = getMatch(/<meta[^>]*property=["']og:description["'][^>]*content=["']([^"']+)["']/i) 
-                  || getMatch(/<meta[^>]*name=["']description["'][^>]*content=["']([^"']+)["']/i) 
-                  || '';
-                  
-    const source = getMatch(/<meta[^>]*property=["']og:site_name["'][^>]*content=["']([^"']+)["']/i) 
-                || new URL(url).hostname;
-                
-    const authorRaw = getMatch(/<meta[^>]*name=["']author["'][^>]*content=["']([^"']+)["']/i);
-    let authors = [];
+
+    const title =
+      getMeta(["meta[property='og:title']", 'meta[name="og:title"]']) ??
+      $('title').first().text().trim() ??
+      url;
+
+    const abstract =
+      getMeta(["meta[property='og:description']", "meta[name='description']", 'meta[name="twitter:description"]']) ??
+      '';
+
+    const source =
+      getMeta(["meta[property='og:site_name']"]) ??
+      (() => { try { return new URL(url).hostname; } catch { return url; } })();
+
+    const authorRaw = getMeta(["meta[name='author']", 'meta[name="article:author"]']);
+    let authors: { last_name: string; first_name: string }[] = [];
     if (authorRaw) {
-      const parts = authorRaw.split(' ');
+      const parts = authorRaw.trim().split(/\s+/);
       if (parts.length === 1) {
         authors.push({ last_name: parts[0], first_name: '' });
       } else {
-        authors.push({ last_name: parts.pop(), first_name: parts.join(' ') });
+        const last = parts.pop()!;
+        authors.push({ last_name: last, first_name: parts.join(' ') });
       }
     }
 
-    const pubDateRaw = getMatch(/<meta[^>]*property=["']article:published_time["'][^>]*content=["']([^"']+)["']/i)
-                    || getMatch(/<meta[^>]*name=["']pubdate["'][^>]*content=["']([^"']+)["']/i);
-    let year = undefined;
+    const pubDateRaw =
+      getMeta(["meta[property='article:published_time']", "meta[name='pubdate']", "meta[name='date']"]) ??
+      $('time[datetime]').first().attr('datetime') ??
+      null;
+    let year: number | undefined;
     if (pubDateRaw) {
       const matchYear = pubDateRaw.match(/^(\d{4})/);
       if (matchYear) year = parseInt(matchYear[1], 10);

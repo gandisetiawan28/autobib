@@ -21,6 +21,7 @@ WARNING: For anchor fields, you MUST copy EXACT verbatim text from the document.
 DO NOT use descriptive locations like "Halaman Judul". DO NOT copy Headings, Titles, or Table Captions, because Word might accidentally find them in the Table of Contents first! Always copy a unique sentence from the BODY paragraphs. IF YOU ABSOLUTELY MUST USE A HEADING AS AN ANCHOR, YOU MUST USE the "target_style" PROPERTY (e.g. "target_style": "Heading 2;SUB-BAB 1") TO AVOID THE TABLE OF CONTENTS!
 CRITICAL: The document text provided to you contains annotations like '[STYLE: Heading 1]'. These annotations are just for your information. DO NOT include the '[STYLE: ...]' tags in your 'find', 'before', or 'after' operations! Only copy the real text.
 EXTREME ACCURACY REQUIRED: You MUST COPY AND PASTE the text exactly as it appears in the document. Do not guess, do not paraphrase, and DO NOT add hallucinated characters like backslashes (\\) or extra spaces. If the text has a typo, you must copy the typo exactly in the 'find' field.
+- STALE ANCHOR PREVENTION: If you previously modified the document and the user reports an error like "Target teks tidak ditemukan", it means you are hallucinating or using old anchors! You MUST re-read the [DOCUMENT CONTENT] section. The [DOCUMENT CONTENT] is ALWAYS up-to-date and reflects the CURRENT state of the user's document. ALWAYS use it as your absolute source of truth for setting anchors, not your memory from previous turns!
 NEW CAPABILITY: You CAN now select text that spans across multiple paragraphs or bullet points!
 If you have a range, use "find-start" and "find-end" (bookend search). Make sure the beginning and the end anchors are 100% exact.
 If you only have one anchor, use "find-single".
@@ -34,7 +35,7 @@ NEW FEATURE:
 - STYLE APPLICATION: When you create NEW text (like a new Chapter, Sub-Chapter, or normal paragraph) using tools, YOU MUST ASSIGN THE CORRECT STYLE from the [AVAILABLE STYLES] list by setting the "style" property. Deduce which style to use (e.g., Chapter vs Paragraph) by looking at how the styles are used in the document structure.
 - DELETING PARAGRAPHS / BLANK LINES: If you want to delete a line, a sentence, or a whole block of text WITHOUT leaving behind an empty blank space/newline, you ABSOLUTELY MUST add "target_type": "paragraph" to your delete operation!
 - CRITICAL SCIENTIFIC WRITING RULE: In Indonesian academic writing, all foreign/English words and species names (e.g., machine learning, Pseudomonas aeruginosa) MUST be italicized. You MUST use markdown *italic* directly inside your 'replace' or 'insert' strings for EVERY foreign word! Example: "menggunakan algoritme *machine learning*."
-- PARAGRAPH FORMATTING: Never write a massive block of text. Split long text into logical paragraphs. Use exactly ONE newline (\n) or TWO (\n\n) to separate paragraphs. Our system will automatically format them into proper scientific paragraphs in Word.
+- PARAGRAPH FORMATTING: Never write a massive block of text. Split long text into logical paragraphs. Use exactly ONE newline (\n) or ONE paragraph mark (^p) to separate regular paragraphs. DO NOT use \n\n or ^p^p for regular paragraphs. However, you MUST use \n\n or ^p^p in these two cases: 1) When placing a paragraph immediately AFTER a Heading, or 2) When placing a NEW Heading immediately AFTER a regular paragraph. Our system will automatically format them into proper scientific paragraphs in Word.
 `;
     
     let index = 1;
@@ -153,5 +154,15 @@ defaultRegistry.registerTool({
   examples: [
     'operations: [ {"path": "frontend/assets/js/chat.js"} ]',
     'operations: [ {"path": "backend/src/server.ts"} ]'
+  ]
+});
+
+defaultRegistry.registerTool({
+  name: 'manage_skill',
+  description: 'Membuat, mengedit, atau menghapus AI Skill (Custom Rule). Gunakan ini jika user meminta Anda untuk mengatur aturan penulisan permanen. Parameter yang didukung: "action" ("create", "update", "delete"), "id" (wajib untuk update/delete, ambil ID dari konteks skill aktif jika user minta mengubah/menghapus), "name", "description", dan "prompt_injection".',
+  examples: [
+    'operations: [ {"action": "create", "name": "Format Heading 1", "description": "Memastikan semua Heading 1 menggunakan style p.h1", "prompt_injection": "Setiap elemen Heading 1 harus selalu diberi target_style \'p.h1\'."} ]',
+    'operations: [ {"action": "update", "id": "123", "name": "...", "description": "...", "prompt_injection": "..."} ]',
+    'operations: [ {"action": "delete", "id": "123"} ]'
   ]
 });

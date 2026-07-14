@@ -316,8 +316,8 @@ window.initMendeley = async () => {
     
     let updatedCount = 0;
     try {
-      // Process in smaller batches of 20 to prevent AI output truncation
-      const batchSize = 20;
+      // Process in smaller batches of 10 (dikurangi karena sekarang bawa payload teks PDF)
+      const batchSize = 10;
       for (let i = 0; i < targets.length; i += batchSize) {
         const batch = targets.slice(i, i + batchSize).map(ref => ({
           id: ref.id,
@@ -473,6 +473,18 @@ window.initMendeley = async () => {
           <div class="ref-card-meta-row">
             <span class="ref-tag type-tag">${typeFmt}</span>
             <span class="ref-source" title="${source}">${source} (${year})</span>
+            <button
+              class="ref-card-pdf-btn loading-pdf"
+              data-doc-id="${ref.id}"
+              title="Memeriksa PDF..."
+              aria-label="Buka PDF viewer"
+            >
+              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+              </svg>
+              PDF
+            </button>
           </div>
           <div class="ref-card-date">Ditambahkan: ${dateAdded}</div>
         </div>
@@ -498,6 +510,22 @@ window.initMendeley = async () => {
       });
 
       els.cardsCont.appendChild(card);
+
+      // ── PDF Viewer (On-Demand) ─────────────────────────
+      const pdfBtn = card.querySelector('.ref-card-pdf-btn');
+      if (pdfBtn) {
+        pdfBtn.classList.remove('loading-pdf');
+        pdfBtn.title = 'Buka PDF';
+        
+        if (ref.file_attached) {
+          pdfBtn.classList.add('has-pdf');
+        }
+        
+        pdfBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (window.PdfViewer) window.PdfViewer.open(ref);
+        });
+      }
     });
     
     if (els.cbSelectAllRefs) {
@@ -557,6 +585,22 @@ window.initMendeley = async () => {
     // Switch to Generate tab
     document.getElementById('tab-btn-generate').click();
   });
+
+  // ── View PDF Button (floating bar) ──────────────────────────────
+  const btnViewPdf = document.getElementById('btn-view-pdf');
+  if (btnViewPdf) {
+    btnViewPdf.addEventListener('click', () => {
+      if (selectedIds.size !== 1) {
+        showToast('Pilih tepat 1 referensi untuk melihat PDF-nya.', 'warning');
+        return;
+      }
+      const refId = Array.from(selectedIds)[0];
+      const ref = references.find(r => r.id === refId);
+      if (ref && window.PdfViewer) {
+        window.PdfViewer.open(ref);
+      }
+    });
+  }
 
   // ── Delete Logic ────────────────────────────────────────────────
   const btnDeleteRefs = document.getElementById('btn-delete-refs');
